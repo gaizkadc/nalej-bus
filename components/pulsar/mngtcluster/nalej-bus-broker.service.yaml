@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker
+  namespace: nalej
+  labels:
+    app: broker
+    component: nalej-bus
+    cluster: management
+spec:
+  ports:
+    - port: 8080
+      name: http
+    - port: 6650
+      name: pulsar
+  clusterIP: None
+  selector:
+    app: pulsar
+    component: broker

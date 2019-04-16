@@ -1,0 +1,82 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: nalej
+  labels:
+    app: zookeeper
+    component: nalej-bus
+    cluster: management
+spec:
+  serviceName: zookeeper
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+        component: nalej-bus
+        cluster: management
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+
+    spec:
+      # Make sure multiple pods of ZK don't get scheduled on the
+      # same node, unless there are no other available nodes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                        - zookeeper
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: zookeeper
+          image: apachepulsar/pulsar-all:2.3.1
+          command: ["sh", "-c"]
+          args:
+            - >
+              bin/apply-config-from-env.py conf/zookeeper.conf &&
+              bin/apply-config-from-env.py conf/pulsar_env.sh &&
+              bin/generate-zookeeper-config.sh conf/zookeeper.conf &&
+              bin/pulsar zookeeper
+          ports:
+            - containerPort: 2181
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: leader-election
+          env:
+            - name: ZOOKEEPER_SERVERS
+              value: zookeeper-0,zookeeper-1,zookeeper-2
+          envFrom:
+            - configMapRef:
+                name: zookeeper-config
+
+          readinessProbe:
+            exec:
+              command:
+                - "bin/pulsar-zookeeper-ruok.sh"
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+
+          livenessProbe:
+            exec:
+              command:
+                - "bin/pulsar-zookeeper-ruok.sh"
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+
+          volumeMounts:
+            - name: datadir
+              mountPath: /pulsar/data
+      volumes:
+        - name: datadir
+          emptyDir: {}

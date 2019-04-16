@@ -1,0 +1,75 @@
+
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: bookie
+  namespace: nalej
+  labels:
+    cluster: management
+    component: nalej-bus
+    app: zookeeper
+spec:
+  template:
+    metadata:
+      labels:
+        cluster: management
+        component: nalej-bus
+        app: zookeeper
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+
+    spec:
+      containers:
+        - name: bookie
+          image: apachepulsar/pulsar-all:2.3.1
+          command: ["sh", "-c"]
+          args:
+            - >
+              bin/apply-config-from-env.py conf/bookkeeper.conf &&
+              bin/apply-config-from-env.py conf/pulsar_env.sh &&
+              bin/pulsar bookie
+          ports:
+            - containerPort: 3181
+              hostPort: 3181
+              name: client
+          envFrom:
+            - configMapRef:
+                name: bookie-config
+          env:
+            - name: advertisedAddress
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+
+          volumeMounts:
+            - name: journal-disk
+              mountPath: /pulsar/data/bookkeeper/journal
+            - name: ledgers-disk
+              mountPath: /pulsar/data/bookkeeper/ledgers
+
+          # bin/bookkeeper shell bookiesanity
+
+      initContainers:
+        # The first time, initialize BK metadata in zookeeper
+        # Otherwise ignore error if it's already there
+        - name: bookie-metaformat
+          image: apachepulsar/pulsar-all:latest
+          command: ["sh", "-c"]
+          args:
+            - >
+              bin/apply-config-from-env.py conf/bookkeeper.conf &&
+              bin/bookkeeper shell metaformat --nonInteractive || true;
+          envFrom:
+            - configMapRef:
+                name: bookie-config
+
+      volumes:
+        # Mount local disks
+        - name: journal-disk
+          hostPath:
+            path: /mnt/disks/ssd0
+        - name: ledgers-disk
+          hostPath:
+            path: /mnt/disks/ssd1
+

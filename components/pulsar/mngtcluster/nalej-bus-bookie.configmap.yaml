@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bookie-config
+  namespace: nalej
+  labels:
+    app: bookie
+    component: nalej-bus
+    cluster: management
+data:
+  PULSAR_MEM: "\" -Xms64m -Xmx256m -XX:MaxDirectMemorySize=256m\""
+  dbStorage_writeCacheMaxSizeMb: "32" # Write cache size (direct memory)
+  dbStorage_readAheadCacheMaxSizeMb: "32" # Read cache size (direct memory)
+  zkServers: zookeeper
+  statsProviderClass: org.apache.bookkeeper.stats.prometheus.PrometheusMetricsProvider

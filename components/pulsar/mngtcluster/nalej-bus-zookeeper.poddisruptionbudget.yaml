@@ -1,0 +1,11 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zookeeper-budget
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+      cluster: management
+      component: nalej-bus
+  minAvailable: 2
