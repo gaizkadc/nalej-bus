@@ -15,5 +15,6 @@ spec:
       name: pulsar
   clusterIP: None
   selector:
-    app: pulsar
-    component: broker
+    app: broker
+    component: nalej-bus
+    cluster: management
