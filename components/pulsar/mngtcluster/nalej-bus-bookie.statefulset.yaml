@@ -1,23 +1,29 @@
-apiVersion: extensions/v1beta1
-kind: DaemonSet
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: bookie
   namespace: nalej
   labels:
     cluster: management
     component: nalej-bus
-    app: zookeeper
+    app: bookie
 spec:
+  serviceName: bookie
+  replicas: 3
+  selector:
+    matchLabels:
+      cluster: management
+      component: nalej-bus
+      app: bookie
   template:
     metadata:
       labels:
         cluster: management
         component: nalej-bus
-        app: zookeeper
+        app: bookie
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8000"
-
     spec:
       containers:
         - name: bookie
@@ -60,13 +66,20 @@ spec:
           envFrom:
             - configMapRef:
                 name: bookie-config
-
-      volumes:
-        # Mount local disks
-        - name: journal-disk
-          hostPath:
-            path: /mnt/disks/ssd0
-        - name: ledgers-disk
-          hostPath:
-            path: /mnt/disks/ssd1
-
+  volumeClaimTemplates:
+    - metadata:
+        name: journal-disk
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: ledgers-disk
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

@@ -5,7 +5,8 @@ metadata:
   namespace: nalej
   labels:
     app: pulsar
-    component: broker
+    component: nalej-bus
+    cluster: management
 spec:
   template:
     spec:
@@ -17,8 +18,8 @@ spec:
             - >
               bin/pulsar initialize-cluster-metadata \
                 --cluster local \
-                --zookeeper zookeeper \
-                --configuration-store zookeeper \
-                --web-service-url http://broker.nalej.svc.cluster.local:8080/ \
-                --broker-service-url pulsar://broker.nalej.svc.cluster.local:6650/ || true;
+                --zookeeper zookeeper.nalej.svc:2181 \
+                --configuration-store zookeeper.nalej.svc:2181 \
+                --web-service-url http://broker.nalej.svc:8080/ \
+                --broker-service-url pulsar://broker.nalej.svc:6650/ || true;
       restartPolicy: Never

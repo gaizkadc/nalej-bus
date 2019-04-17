@@ -11,8 +11,8 @@ data:
   # Tune for available memory. Increase the heap up to 24G to have
   # better GC behavior at high throughput
   PULSAR_MEM: "\" -Xms64m -Xmx128m -XX:MaxDirectMemorySize=128m\""
-  zookeeperServers: zookeeper
-  configurationStoreServers: zookeeper
+  zookeeperServers: zookeeper.nalej.svc:2181
+  configurationStoreServers: zookeeper.nalej.svc:2181
   clusterName: local
   # change the managed ledger settings if you have more bookies
   managedLedgerDefaultEnsembleSize: "1"

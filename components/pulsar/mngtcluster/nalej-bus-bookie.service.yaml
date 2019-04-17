@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bookkeeper
+  name: bookie
   namespace: nalej
   labels:
     app: bookie
@@ -11,7 +11,7 @@ spec:
   ports:
     - port: 3181
       name: server
-  clusterIP: None
+  type: ClusterIP
   selector:
     app: bookie
     component: nalej-bus

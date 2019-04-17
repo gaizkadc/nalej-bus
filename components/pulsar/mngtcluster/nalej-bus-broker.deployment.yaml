@@ -13,8 +13,9 @@ spec:
   template:
     metadata:
       labels:
-        app: pulsar
-        component: broker
+        cluster: management
+        component: nalej-bus
+        app: broker
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
