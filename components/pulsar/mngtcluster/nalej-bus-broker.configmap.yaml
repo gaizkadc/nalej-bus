@@ -19,5 +19,5 @@ data:
   managedLedgerDefaultWriteQuorum: "1"
   managedLedgerDefaultAckQuorum: "1"
   # enable pulsar functions
-  functionsWorkerEnabled: "true"
+  functionsWorkerEnabled: "false"
   PF_pulsarFunctionsCluster: local

@@ -16,6 +16,6 @@ spec:
           command: ["sh", "-c"]
           args:
             - >
-              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 tenants create nalej &&
-              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 namespaces create management || true;
-      restartPolicy: OnFailure
+              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 tenants create nalej --admin-roles admin --allowed-clusters local &&
+              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 namespaces create nalej/operations --clusters local || true;
+      restartPolicy: Always

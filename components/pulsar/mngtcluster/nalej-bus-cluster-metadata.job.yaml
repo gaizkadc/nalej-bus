@@ -22,4 +22,4 @@ spec:
                 --configuration-store zookeeper.nalej.svc:2181 \
                 --web-service-url http://broker.nalej.svc:8080/ \
                 --broker-service-url pulsar://broker.nalej.svc:6650/ || true;
-      restartPolicy: Never
+      restartPolicy: OnFailure
