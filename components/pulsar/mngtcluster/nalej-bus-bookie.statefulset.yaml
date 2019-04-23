@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bookie
+  namespace: __NPH_NAMESPACE
+  labels:
+    cluster: management
+    component: nalej-bus
+    app: bookie
+spec:
+  serviceName: bookie
+  replicas: 3
+  selector:
+    matchLabels:
+      cluster: management
+      component: nalej-bus
+      app: bookie
+  template:
+    metadata:
+      labels:
+        cluster: management
+        component: nalej-bus
+        app: bookie
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+    spec:
+      # Make sure multiple bookies don't get scheduled on the
+      # same node, unless there are no other available nodes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                        - bookie
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: bookie
+          image: apachepulsar/pulsar-all:2.3.1
+          command: ["sh", "-c"]
+          args:
+            - >
+              bin/apply-config-from-env.py conf/bookkeeper.conf &&
+              bin/apply-config-from-env.py conf/pulsar_env.sh &&
+              bin/pulsar bookie
+          ports:
+            - containerPort: 3181
+              hostPort: 3181
+              name: client
+          envFrom:
+            - configMapRef:
+                name: bookie-config
+          env:
+            - name: advertisedAddress
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+
+          volumeMounts:
+            - name: journal-disk
+              mountPath: /pulsar/data/bookkeeper/journal
+            - name: ledgers-disk
+              mountPath: /pulsar/data/bookkeeper/ledgers
+
+      initContainers:
+        # The first time, initialize BK metadata in zookeeper
+        # Otherwise ignore error if it's already there
+        - name: bookie-metaformat
+          image: apachepulsar/pulsar-all:2.3.1
+          command: ["sh", "-c"]
+          args:
+            - >
+              bin/apply-config-from-env.py conf/bookkeeper.conf &&
+              bin/bookkeeper shell metaformat --nonInteractive || true;
+          envFrom:
+            - configMapRef:
+                name: bookie-config
+  volumeClaimTemplates:
+    - metadata:
+        name: journal-disk
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: ledgers-disk
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: broker-config
+  namespace: __NPH_NAMESPACE
+  labels:
+    app: broker
+    component: nalej-bus
+    cluster: management
+data:
+  # Tune for available memory. Increase the heap up to 24G to have
+  # better GC behavior at high throughput
+  PULSAR_MEM: "\" -Xms64m -Xmx128m -XX:MaxDirectMemorySize=128m\""
+  zookeeperServers: zookeeper.__NPH_NAMESPACE.svc:2181
+  configurationStoreServers: zookeeper.__NPH_NAMESPACE.svc:2181
+  clusterName: local
+  # change the managed ledger settings if you have more bookies
+  managedLedgerDefaultEnsembleSize: "1"
+  managedLedgerDefaultWriteQuorum: "1"
+  managedLedgerDefaultAckQuorum: "1"
+  # enable pulsar functions
+  functionsWorkerEnabled: "false"
+  PF_pulsarFunctionsCluster: local

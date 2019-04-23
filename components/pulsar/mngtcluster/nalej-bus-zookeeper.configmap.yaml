@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zookeeper-config
+  namespace: __NPH_NAMESPACE
+  labels:
+    cluster: management
+    component: nalej-bus
+    app: zookeeper
+data:
+  PULSAR_MEM: "\" -Xms100m -Xmx256m \""
+  PULSAR_GC: "\" -XX:+UseG1GC -XX:MaxGCPauseMillis=10\""

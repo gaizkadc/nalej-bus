@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pulsar-topics
+  namespace: __NPH_NAMESPACE
+  labels:
+    app: pulsar
+    component: nalej-bus
+    cluster: management
+spec:
+  template:
+    spec:
+      containers:
+        - name: pulsar-topics
+          image: apachepulsar/pulsar:2.3.1
+          command: ["sh", "-c"]
+          args:
+            - >
+              bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 tenants create nalej --admin-roles admin --allowed-clusters local &&
+              bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/application --clusters local &&
+              bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/infrastructure --clusters local &&
+              bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/app-network --clusters local;
+      restartPolicy: OnFailure

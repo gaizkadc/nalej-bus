@@ -1,0 +1,43 @@
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: broker
+  namespace: __NPH_NAMESPACE
+  labels:
+    cluster: management
+    component: nalej-bus
+    app: broker
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        cluster: management
+        component: nalej-bus
+        app: broker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+        - name: broker
+          image: apachepulsar/pulsar-all:2.3.1
+          command: ["sh", "-c"]
+          args:
+            - >
+              bin/apply-config-from-env.py conf/broker.conf &&
+              bin/apply-config-from-env.py conf/pulsar_env.sh &&
+              bin/gen-yml-from-env.py conf/functions_worker.yml &&
+              bin/pulsar broker
+          ports:
+            - containerPort: 8080
+            - containerPort: 6650
+          envFrom:
+            - configMapRef:
+                name: broker-config
+          env:
+            - name: advertisedAddress
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
