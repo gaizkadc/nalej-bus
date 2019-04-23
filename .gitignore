@@ -1,7 +1,5 @@
-bin
-bin/*
-vendor
-vendor/*
-.idea
-.idea/*
+bazel-*
 *.swp
+*.idea
+bin/*
+vendor/*

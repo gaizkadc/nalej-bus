@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: zookeeper-config
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     cluster: management
     component: nalej-bus

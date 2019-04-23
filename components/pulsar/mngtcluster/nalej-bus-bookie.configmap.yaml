@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: bookie-config
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     app: bookie
     component: nalej-bus

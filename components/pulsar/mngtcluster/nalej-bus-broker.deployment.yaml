@@ -3,7 +3,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: broker
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     cluster: management
     component: nalej-bus

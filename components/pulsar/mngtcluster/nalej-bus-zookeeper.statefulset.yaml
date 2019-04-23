@@ -2,7 +2,7 @@ apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
   name: zookeeper
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     app: zookeeper
     component: nalej-bus

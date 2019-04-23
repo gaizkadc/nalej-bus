@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: broker-config
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     app: broker
     component: nalej-bus

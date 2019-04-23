@@ -4,7 +4,7 @@ metadata:
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   name: zookeeper
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     cluster: management
     component: nalej-bus

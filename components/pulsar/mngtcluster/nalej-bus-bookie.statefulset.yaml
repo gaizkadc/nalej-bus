@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: bookie
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     cluster: management
     component: nalej-bus
@@ -25,6 +25,20 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8000"
     spec:
+      # Make sure multiple bookies don't get scheduled on the
+      # same node, unless there are no other available nodes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                        - bookie
+                topologyKey: "kubernetes.io/hostname"
       containers:
         - name: bookie
           image: apachepulsar/pulsar-all:2.3.1

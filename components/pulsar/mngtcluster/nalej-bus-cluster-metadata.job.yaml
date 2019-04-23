@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: pulsar-cluster-metadata-init
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     app: pulsar
     component: nalej-bus

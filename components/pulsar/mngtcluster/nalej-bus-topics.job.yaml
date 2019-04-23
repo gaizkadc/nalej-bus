@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: pulsar-topics
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
   labels:
     app: pulsar
     component: nalej-bus
@@ -17,5 +17,7 @@ spec:
           args:
             - >
               bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 tenants create nalej --admin-roles admin --allowed-clusters local &&
-              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 namespaces create nalej/operations --clusters local || true;
-      restartPolicy: Always
+              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 namespaces create nalej/application --clusters local &&
+              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 namespaces create nalej/infrastructure --clusters local &&
+              bin/pulsar-admin --admin-url http://broker.nalej.svc:8080 namespaces create nalej/app-network --clusters local;
+      restartPolicy: OnFailure

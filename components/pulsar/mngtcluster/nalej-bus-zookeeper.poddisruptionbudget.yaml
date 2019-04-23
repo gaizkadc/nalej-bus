@@ -2,6 +2,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: zookeeper-budget
+  namespace: __NPH_NAMESPACE
 spec:
   selector:
     matchLabels:
