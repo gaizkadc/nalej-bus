@@ -31,5 +31,15 @@ Bookie and Zookeeper solutions to use stateful sets instead. In the case of the 
 should be added to enforce pods to not be deployed into the same physical host.
 
     
+## Topics
+
+The complete installation of the pulsar component generates the following topics:
+* infrastructure/ops
+* infrastructure/events
+* application/ops
+* application/events
+* network-app/ops
+* network-app/events
+
 
 
