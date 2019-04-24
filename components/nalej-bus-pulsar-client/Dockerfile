@@ -15,19 +15,16 @@ RUN apk add --no-cache --virtual build-dependencies \
     gtest-dev \
     gtest \
     gmock \
-    && rm -rf /var/cache/apk/*
-
-RUN git clone https://github.com/apache/pulsar.git \
+    && rm -rf /var/cache/apk/ \
+    && git clone https://github.com/apache/pulsar.git \
     && cd pulsar \
     && git checkout tags/v2.3.1 \
     && cd pulsar-client-cpp \
     && cmake . \
     && make -j 2 \
-    && make install
-
-# library is now available at /usr/local/lib/libpulsar.so
-# headers are available at /usr/local/include/pulsar
-
-RUN cd ../.. \
+    && make install \
+    && cd ../.. \
     && rm -rf pulsar \
     && apk -v del build-dependencies
+    # library is now available at /usr/local/lib/libpulsar.so
+    # headers are available at /usr/local/include/pulsar
