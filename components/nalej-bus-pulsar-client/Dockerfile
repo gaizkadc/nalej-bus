@@ -25,6 +25,7 @@ RUN apk add --no-cache --virtual build-dependencies \
     && make install \
     && cd ../.. \
     && rm -rf pulsar \
+    && rm -rf .github \
     && apk -v del build-dependencies
     # library is now available at /usr/local/lib/libpulsar.so
     # headers are available at /usr/local/include/pulsar
