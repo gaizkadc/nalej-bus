@@ -10,6 +10,12 @@ import (
     "github.com/apache/pulsar/pulsar-client-go/pulsar"
     "github.com/nalej/derrors"
     "github.com/nalej/nalej-bus/internal/bus"
+    "time"
+)
+
+const (
+    // Number of seconds to wait before we consider a timeout for a receive operation
+    NalejPulsarReceiveTimeout = 5
 )
 
 
@@ -33,6 +39,7 @@ func(p PulsarConsumerType) translate() pulsar.SubscriptionType {
     }
     return -1
 }
+
 
 
 
@@ -65,7 +72,10 @@ func NewPulsarConsumer(client pulsar.Client, name string, topic string, consumer
 
 
 func (c PulsarConsumer) Receive() ([]byte, derrors.Error) {
-    msg, err := c.consumer.Receive(context.Background())
+    ctx, cancel := context.WithTimeout(context.Background(), NalejPulsarReceiveTimeout*time.Second)
+    defer cancel()
+
+    msg, err := c.consumer.Receive(ctx)
     if err != nil {
         return nil, derrors.NewInternalError("failed receiving message", err)
     }

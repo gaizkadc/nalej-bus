@@ -9,7 +9,15 @@ import (
     "github.com/apache/pulsar/pulsar-client-go/pulsar"
     "github.com/nalej/derrors"
     "github.com/nalej/nalej-bus/internal/bus"
+    "time"
 )
+
+const (
+    // Number of seconds to wait before we consider a timeout for a receive operation
+    NalejPulsarSendTimeout = 5
+)
+
+
 
 // Nalej producer object is a wrapper of an Apache Pulsar client.
 type PulsarProducer struct {
@@ -39,7 +47,10 @@ func NewPulsarProducer(client pulsar.Client, name string, topic string) (bus.Nal
 }
 
 func(prod PulsarProducer) Send(msg []byte) derrors.Error {
-    err := prod.producer.Send(context.Background(), pulsar.ProducerMessage{Payload: msg})
+    ctx, cancel := context.WithTimeout(context.Background(), NalejPulsarSendTimeout*time.Second)
+    defer cancel()
+
+    err := prod.producer.Send(ctx, pulsar.ProducerMessage{Payload: msg})
     if err != nil {
         return derrors.NewInternalError("impossible to send message", err)
     }
