@@ -33,7 +33,7 @@ type NalejProducer interface {
     //  error if any
     Send(msg []byte) derrors.Error
 
-    // Close the producer. This operation must close any connection with brokers with an estabalished connection.
+    // Close the producer. This operation must close any connection with brokers with an established connection.
     // return:
     //  error if any
     Close() derrors.Error

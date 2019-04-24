@@ -49,6 +49,9 @@ type PulsarConsumer struct {
 //  type of consumer: exclusive, shared or failover. See pulsar documentation for more details.
 //
 func NewPulsarConsumer(client pulsar.Client, name string, topic string, consumerType PulsarConsumerType) (bus.NalejConsumer, derrors.Error) {
+    if client == nil {
+        return nil, derrors.NewFailedPreconditionError("received nil pulsar client")
+    }
     internalConsumer, err := client.Subscribe(pulsar.ConsumerOptions{
         SubscriptionName: name,
         Topic: topic,
@@ -66,7 +69,8 @@ func (c PulsarConsumer) Receive() ([]byte, derrors.Error) {
     if err != nil {
         return nil, derrors.NewInternalError("failed receiving message", err)
     }
-
+    // By default we Acknowledge this message
+    c.consumer.Ack(msg)
     return msg.Payload(), nil
 }
 

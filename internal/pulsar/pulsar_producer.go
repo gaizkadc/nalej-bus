@@ -22,6 +22,9 @@ type PulsarProducer struct {
 //  name of this producer
 //  topic
 func NewPulsarProducer(client pulsar.Client, name string, topic string) (bus.NalejProducer, derrors.Error) {
+    if client == nil {
+        return nil, derrors.NewFailedPreconditionError("received nil pulsar client")
+    }
     internalProducer,err := client.CreateProducer(
         pulsar.ProducerOptions{
         Topic: topic,
@@ -44,7 +47,7 @@ func(prod PulsarProducer) Send(msg []byte) derrors.Error {
 }
 
 func(prod PulsarProducer) Close() derrors.Error {
-    err := prod.client.Close()
+    err := prod.producer.Close()
     if err != nil {
         return derrors.NewInternalError("impossible to close producer", err)
     }

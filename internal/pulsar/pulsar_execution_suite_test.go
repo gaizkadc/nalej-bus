@@ -12,7 +12,7 @@ import (
 )
 
 func TestPulsar(t *testing.T) {
-    gomega.RegisterFailHandler(Fail)
+    gomega.RegisterFailHandler(ginkgo.Fail)
     ginkgo.RunSpecs(t, "Pulsar executor Suite")
 }
 

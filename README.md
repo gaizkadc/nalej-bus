@@ -41,5 +41,69 @@ The complete installation of the pulsar component generates the following topics
 * network-app/ops
 * network-app/events
 
+## Nalej-bus client
+
+The Nalej bus client encapsulates basic operations to work with the nalej bus. The current
+version offers an Apache Pulsar wrapper with basic functionality. In order to compile this
+client you need the C++ pulsar client library installed in your local environment. For MacOS
+run: ```brew install libpulsar```. For other operative system check the instructions at 
+https://pulsar.apache.org/docs/en/develop-cpp/
+
+### Nalej-bus client example
+The following example describes how to create a Nalej-bus client for a pulsar backend.
+
+```
+import "github.com/nalej-bus/pulsar 
+
+// Create client, only indicate host and port. No protocol is required.
+// Additional parameters indicate the timeout in seconds and the number of threads
+// used for listening.
+client, err := pulsar.NewClient("localhost:6650",5,1)
+if err != nil {
+    log.Panic("impossible to create client")
+}
+
+// Create a producer
+prod,err := NewPulsarProducer(client, "prod1", "public/default/topic")
+if err != nil {
+    log.Panic("impossible to create a producer")
+}
+
+// Send something to the queue
+msg:="this is a test message"
+err = prod.send([]byte(msg))
+if err != nil {
+    log.Panic("error when sending message")
+}
+
+// Create a consumer
+cons, err := NewPulsarConsumer(client, "cons1", "public/default/topic", PulsarExclusiveConsumer)
+
+// Block execution flow until we receive something
+rec_msg, err := cons.receive()
+if err != nil {
+    log.Panic("Error when receiving data")
+}
+
+log.Info().Msg(string(rec_msg))
+
+// Close connections
+prod.Close()
+cons.Close()
+client.Close()
+```
+
+### Considerations
+* By default the Nalej Pulsar client acknowledges received messages.
+* If using shared subscriptions, the name of the subscription must be the same. 
+See https://pulsar.apache.org/docs/en/concepts-messaging/#subscription-modes for more details
 
 
+## Integration tests
+
+The following set of variables have go be set in order to proceed with integration tests.
+
+| Variable  | Example Value | Description |
+| ------------- | ------------- |------------- |
+| RUN_INTEGRATION_TEST  | true | Run integration tests |
+| IT_PULSAR_ADDRESS | localhost:6650 | Address of an available pulsar message queue |

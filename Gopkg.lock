@@ -91,6 +91,18 @@
   version = "v1.5.0"
 
 [[projects]]
+  digest = "1:ab474d6efd05d6a21bf2544a78821e721c9cb02aeef09df37a983ab07bdad562"
+  name = "github.com/rs/zerolog"
+  packages = [
+    ".",
+    "internal/cbor",
+    "internal/json",
+  ]
+  pruneopts = ""
+  revision = "3e85c4b21c1adb254dd43a93d93263fbe7d9dc13"
+  version = "v1.14.0"
+
+[[projects]]
   digest = "1:631ea4a52a20ca54eceb1077e8c7e553a4f86a58639824825d9259374f7c362f"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -185,6 +197,7 @@
     "github.com/nalej/derrors",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
+    "github.com/rs/zerolog",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
