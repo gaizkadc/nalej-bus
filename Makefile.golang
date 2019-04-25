@@ -127,7 +127,7 @@ yaml:
 
 # Package all images and components
 .PHONY: image create-image
-image: build-linux create-image
+image: az-login build-linux create-image az-logout
 
 create-image:
 	@echo ">>> Creating docker images ..."
@@ -146,7 +146,7 @@ create-image:
 
 # Publish the image
 .PHONY: publish az-login az-logout publish-image
-publish: image az-login publish-image az-logout
+publish: az-login image publish-image az-logout
 
 az-login:
 	@echo ">>> Logging in Azure and Azure Container Registry ..."
