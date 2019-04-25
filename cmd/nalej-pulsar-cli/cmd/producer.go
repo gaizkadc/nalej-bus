@@ -6,7 +6,7 @@ package cmd
 
 import (
     "fmt"
-    "github.com/nalej/nalej-bus/internal/pulsar"
+    "github.com/nalej/nalej-bus/internal/pulsar-comcast"
     "github.com/rs/zerolog/log"
     "github.com/spf13/cobra"
     "time"
@@ -34,17 +34,11 @@ func init() {
 }
 
 func runProducer() {
-    client, err := pulsar.NewClient(pulsarAddress,5, 1)
-    if err != nil {
-        log.Panic().Msg(err.Error())
-    }
+    client := pulsar_comcast.NewClient(pulsarAddress)
 
-    producer, err := pulsar.NewPulsarProducer(client, producerName, producerTopic)
-    if err != nil {
-        log.Panic().Msg(err.Error())
-    }
+    producer := pulsar_comcast.NewPulsarProducer(client, producerName, producerTopic)
+
     defer producer.Close()
-    defer client.Close()
 
     counter := 0
     tick := time.Tick(time.Second)
@@ -52,9 +46,9 @@ func runProducer() {
         select {
             case <- tick:
                 msg := fmt.Sprintf("Message number %d", counter)
-                err = producer.Send([]byte(msg))
+                err := producer.Send([]byte(msg))
                 if err != nil {
-                    log.Error().Err(err)
+                    log.Error().Err(err).Msg("")
                 } else {
                     log.Info().Str("msg", msg).Msg("->")
                 }

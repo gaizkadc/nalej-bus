@@ -6,7 +6,7 @@
 package cmd
 
 import (
-    "github.com/nalej/nalej-bus/internal/pulsar"
+    "github.com/nalej/nalej-bus/internal/pulsar-comcast"
     "github.com/rs/zerolog/log"
     "github.com/spf13/cobra"
 )
@@ -35,16 +35,10 @@ func init() {
 }
 
 func runConsumer () {
-    client, err := pulsar.NewClient(pulsarAddress,5, 1)
-    if err != nil {
-        log.Panic().Msg(err.Error())
-    }
+    client := pulsar_comcast.NewClient(pulsarAddress)
 
-
-    consumer,err := pulsar.NewPulsarConsumer(client, consumerName, topicConsumer, pulsar.PulsarExclusiveConsumer)
-    if err != nil {
-        log.Panic().Msg(err.Error())
-    }
+    consumer := pulsar_comcast.NewPulsarConsumer(client, consumerName, topicConsumer, true)
+    defer consumer.Close()
 
     for {
         msg, err := consumer.Receive()
@@ -56,8 +50,6 @@ func runConsumer () {
 
     }
 
-    defer consumer.Close()
-    defer client.Close()
 
 
 }
