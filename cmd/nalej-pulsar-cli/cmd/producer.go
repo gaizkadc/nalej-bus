@@ -28,8 +28,8 @@ var producerCmd = &cobra.Command{
 }
 
 func init() {
-    producerCmd.Flags().StringVar(&producerTopic, "producerTopic", "public/default/topic", "Topic this producer will publish into")
-    producerCmd.Flags().StringVar(&producerName, "producerName", "producer", "Name for this producer")
+    producerCmd.Flags().StringVar(&producerTopic, "topic", "public/default/topic", "Topic this producer will publish into")
+    producerCmd.Flags().StringVar(&producerName, "name", "producer", "Name for this producer")
     RootCmd.AddCommand(producerCmd)
 }
 

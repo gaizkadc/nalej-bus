@@ -6,7 +6,6 @@ package pulsar_comcast
 
 import (
     "context"
-    "fmt"
     "github.com/Comcast/pulsar-client-go"
     "github.com/nalej/derrors"
     "github.com/nalej/nalej-bus/internal/bus"
@@ -19,7 +18,7 @@ const (
 )
 
 type PulsarProducer struct {
-    producer pulsar.ManagedProducer
+    producer *pulsar.ManagedProducer
 
 }
 
@@ -37,7 +36,7 @@ func NewPulsarProducer(client PulsarClient, name string, topic string) bus.Nalej
     // create producer
     producer := pulsar.NewManagedProducer(client.pool, cfg)
 
-    return PulsarProducer{producer: *producer}
+    return PulsarProducer{producer: producer}
 }
 
 // Send a new message to the topic of this producer.
@@ -48,10 +47,9 @@ func NewPulsarProducer(client PulsarClient, name string, topic string) bus.Nalej
 func(p PulsarProducer) Send(msg []byte) derrors.Error {
     ctx, cancel := context.WithTimeout(context.Background(), time.Second * NalejPulsarSendTimeout)
     defer cancel()
-    fmt.Println(p.producer)
+
     _, err := p.producer.Send(ctx, msg)
 
-    fmt.Println(err.Error())
     if err != nil {
         return derrors.NewInternalError("impossible to send message", err)
     }

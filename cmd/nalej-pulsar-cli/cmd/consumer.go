@@ -29,8 +29,8 @@ var consumerCmd = &cobra.Command{
 }
 
 func init() {
-    producerCmd.Flags().StringVar(&topicConsumer, "topicConsumer", "public/default/topic", "Topic this consumer will publish into")
-    producerCmd.Flags().StringVar(&consumerName, "consumerName", "consumer", "Name for this consumer")
+    consumerCmd.Flags().StringVar(&topicConsumer, "topic", "public/default/topic", "Topic this consumer will publish into")
+    consumerCmd.Flags().StringVar(&consumerName, "name", "consumer", "Name for this consumer")
     RootCmd.AddCommand(consumerCmd)
 }
 
@@ -45,7 +45,7 @@ func runConsumer () {
         if err != nil {
             log.Error().Err(err)
         } else {
-            log.Info().Bytes("received",msg).Msg("<-")
+            log.Info().Str("received",string(msg)).Msg("<-")
         }
 
     }

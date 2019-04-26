@@ -18,7 +18,7 @@ const (
 )
 
 type PulsarConsumer struct {
-    consumer pulsar.ManagedConsumer
+    consumer *pulsar.ManagedConsumer
 }
 
 func NewPulsarConsumer(client PulsarClient, name string, topic string, exclusive bool) bus.NalejConsumer {
@@ -29,7 +29,7 @@ func NewPulsarConsumer(client PulsarClient, name string, topic string, exclusive
         ManagedClientConfig: client.config,
     }
     consumer := pulsar.NewManagedConsumer(client.pool, config)
-    return PulsarConsumer{consumer: *consumer}
+    return PulsarConsumer{consumer: consumer}
 }
 
 // Receive a message from a subscribed entry
