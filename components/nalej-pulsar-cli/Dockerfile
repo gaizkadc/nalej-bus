@@ -1,3 +1,8 @@
+###
+## This image is going to be ignored until we have a solution for the cross-compilation problem.
+##
+
+
 FROM nalejdev.azurecr.io/juan/mypulsar:latest AS pulsar
 
 FROM scratch AS base

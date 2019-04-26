@@ -6,7 +6,7 @@
 package cmd
 
 import (
-    "github.com/nalej/nalej-bus/internal/pulsar"
+    "github.com/nalej/nalej-bus/internal/pulsar-comcast"
     "github.com/rs/zerolog/log"
     "github.com/spf13/cobra"
 )
@@ -29,35 +29,27 @@ var consumerCmd = &cobra.Command{
 }
 
 func init() {
-    producerCmd.Flags().StringVar(&topicConsumer, "topicConsumer", "public/default/topic", "Topic this consumer will publish into")
-    producerCmd.Flags().StringVar(&consumerName, "consumerName", "consumer", "Name for this consumer")
+    consumerCmd.Flags().StringVar(&topicConsumer, "topic", "public/default/topic", "Topic this consumer will publish into")
+    consumerCmd.Flags().StringVar(&consumerName, "name", "consumer", "Name for this consumer")
     RootCmd.AddCommand(consumerCmd)
 }
 
 func runConsumer () {
-    client, err := pulsar.NewClient(pulsarAddress,5, 1)
-    if err != nil {
-        log.Panic().Msg(err.Error())
-    }
+    client := pulsar_comcast.NewClient(pulsarAddress)
 
-
-    consumer,err := pulsar.NewPulsarConsumer(client, consumerName, topicConsumer, pulsar.PulsarExclusiveConsumer)
-    if err != nil {
-        log.Panic().Msg(err.Error())
-    }
+    consumer := pulsar_comcast.NewPulsarConsumer(client, consumerName, topicConsumer, true)
+    defer consumer.Close()
 
     for {
         msg, err := consumer.Receive()
         if err != nil {
             log.Error().Err(err)
         } else {
-            log.Info().Bytes("received",msg).Msg("<-")
+            log.Info().Str("received",string(msg)).Msg("<-")
         }
 
     }
 
-    defer consumer.Close()
-    defer client.Close()
 
 
 }
