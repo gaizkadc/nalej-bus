@@ -11,6 +11,7 @@ import (
     "github.com/nalej/grpc-conductor-go"
     "github.com/nalej/nalej-bus/pkg/bus"
     "github.com/nalej/nalej-bus/pkg/queue"
+    "github.com/rs/zerolog/log"
 )
 
 const (
@@ -67,51 +68,52 @@ func (m ApplicationOpsProducer) Send(msg proto.Message) derrors.Error {
 // Application consumer
 type ApplicationOpsConsumer struct {
     consumer bus.NalejConsumer
+    config ConfigApplicationOpsConsumer
 }
 
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
 type ConfigApplicationOpsConsumer struct {
-    // function to process deployment requests
-    fDeploymentReq func(in grpc_conductor_go.DeploymentRequest)()
-    // function to process undeploy requests
-    fUndeployReq func(in grpc_conductor_go.UndeployRequest)()
+    // channel to receive deployment requests
+    chDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
+    // channel to receive undeploy requests
+    chUndeployRequest chan *grpc_conductor_go.UndeployRequest
 }
 
-func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool) (*ApplicationOpsConsumer, derrors.Error) {
+func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
     consumer, err := client.BuildConsumer(name, InfrastructureOpsTopic, exclusive)
     if err != nil {
         return nil, err
     }
 
     return &ApplicationOpsConsumer{consumer: consumer}, nil
-
 }
 
-/*
-// Consume any of the potential objects
-func (c ApplicationOpsConsumer) Consume() (proto.Message, interface{}, derrors.Error) {
+
+// Consume any of the possible objects that can be sent to this queue and send it to the corresponding channel.
+func (c ApplicationOpsConsumer) Consume() derrors.Error{
     msg, err := c.consumer.Receive()
     if err != nil {
-        return nil, nil, err
+        return err
     }
 
     target := &grpc_bus_go.ApplicationOps{}
 
     derr := queue.UnmarshallPbMsg(msg, target)
     if derr != nil {
-        return nil, nil, derr
+        return derr
     }
 
     switch x := target.Operation.(type) {
     case *grpc_bus_go.ApplicationOps_DeployRequest:
-
-        //return x.DeployRequest, grpc_conductor_go.DeploymentRequest.ProtoMessage, nil
+        c.config.chDeploymentRequest <- x.DeployRequest
     case *grpc_bus_go.ApplicationOps_UndeployRequest:
-        return x.UndeployRequest, grpc_conductor_go.DeploymentRequest.ProtoMessage, nil
+        c.config.chUndeployRequest <- x.UndeployRequest
     case nil:
-        return nil, nil, derrors.NewInternalError("applicationOpsConsumer was not set in consume method")
+        log.Error().Msg("received nil entry")
+        return derrors.NewInvalidArgumentError("received nil entry from infrastructure ops")
     default:
-        return nil, nil, derrors.NewInternalError(fmt.Sprintf("Profile.Avatar has unexpected type %T", x))
+        log.Error().Interface("type",x).Msg("unknown object type in infrastructure ops")
+        return derrors.NewInvalidArgumentError("unknown object type in infrastructure ops")
     }
+    return nil
 }
-*/
