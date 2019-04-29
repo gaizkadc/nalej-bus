@@ -8,9 +8,30 @@ import (
     "github.com/nalej/derrors"
 )
 
+// Interface for nalej clients.
+type NalejClient interface {
+
+    // Build a producer using this client
+    // params:
+    //  name of the producer
+    //  topic this producer will use
+    // return:
+    //  resulting producer
+    //  error if any
+    BuildProducer(name string, topic string) (NalejProducer, derrors.Error)
+
+    // Build a consumer using this client
+    // params:
+    //  name of the producer
+    //  topic this producer will use
+    //  exclusive sets this consumer as the only one consuming data from the topic
+    // return:
+    //  resulting consumer
+    //  error if any
+    BuildConsumer(name string, topic string, exclusive bool) (NalejConsumer, derrors.Error)
+}
 
 // Main interfaces to be implemented by any producer or consumer in the Nalej platform
-
 type NalejConsumer interface {
     // Receive a message from a subscribed entry
     // return:

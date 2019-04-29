@@ -36,7 +36,10 @@ func init() {
 func runProducer() {
     client := pulsar_comcast.NewClient(pulsarAddress)
 
-    producer := pulsar_comcast.NewPulsarProducer(client, producerName, producerTopic)
+    producer, error := client.BuildProducer(producerName, producerTopic)
+    if error != nil {
+        log.Panic().Err(error).Msg("Impossible to build producer")
+    }
 
     defer producer.Close()
 

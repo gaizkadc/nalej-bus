@@ -37,7 +37,11 @@ func init() {
 func runConsumer () {
     client := pulsar_comcast.NewClient(pulsarAddress)
 
-    consumer := pulsar_comcast.NewPulsarConsumer(client, consumerName, topicConsumer, true)
+    consumer,error := client.BuildConsumer(consumerName, topicConsumer, true)
+    if error!=nil{
+        log.Panic().Err(error).Msg("impossible to build consumer")
+    }
+
     defer consumer.Close()
 
     for {
