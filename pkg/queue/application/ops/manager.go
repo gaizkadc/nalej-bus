@@ -5,6 +5,7 @@
 package ops
 
 import (
+    "github.com/golang/protobuf/proto"
     "github.com/nalej/derrors"
     "github.com/nalej/grpc-bus-go"
     "github.com/nalej/grpc-conductor-go"
@@ -34,32 +35,26 @@ func NewApplicationOpsProducer (client bus.NalejClient, name string) (*Applicati
     return &ApplicationOpsProducer{producer: prod}, nil
 }
 
+// Generic function that decides what to send depending on the object type.
+func (m ApplicationOpsProducer) Send(msg proto.Message) derrors.Error {
 
-func (m ApplicationOpsProducer) SendDeployRequest(req grpc_conductor_go.DeploymentRequest) derrors.Error {
-    wrapper := grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_DeployRequest{&req} }
+    var  wrapper grpc_bus_go.ApplicationOps
 
-    msg, err := queue.MarshallPbMsg(&wrapper)
+    switch x := msg.(type) {
+    case *grpc_conductor_go.DeploymentRequest:
+        wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_DeployRequest{x}}
+    case *grpc_conductor_go.UndeployRequest:
+        wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_UndeployRequest{x}}
+    default:
+        return derrors.NewInvalidArgumentError("invalid proto message type")
+    }
+
+    payload, err := queue.MarshallPbMsg(&wrapper)
     if err != nil {
         return err
     }
 
-    err = m.producer.Send(msg)
-    if err != nil {
-        return err
-    }
-
-    return nil
-}
-
-func (m ApplicationOpsProducer) SendUndeployRequest(req grpc_conductor_go.UndeployRequest) derrors.Error {
-    wrapper := grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_UndeployRequest{&req} }
-
-    msg, err := queue.MarshallPbMsg(&wrapper)
-    if err != nil {
-        return err
-    }
-
-    err = m.producer.Send(msg)
+    err = m.producer.Send(payload)
     if err != nil {
         return err
     }
