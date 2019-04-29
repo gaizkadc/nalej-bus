@@ -6,8 +6,8 @@ package pulsar_comcast
 
 import (
     "github.com/nalej/derrors"
-    "github.com/nalej/nalej-bus/internal/bus"
-    "github.com/nalej/nalej-bus/internal/utils"
+    "github.com/nalej/nalej-bus/pkg/bus"
+    "github.com/nalej/nalej-bus/pkg/utils"
     "github.com/onsi/ginkgo"
     "github.com/onsi/gomega"
     "os"
@@ -40,7 +40,7 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
 
         ginkgo.BeforeEach(func(){
             //create client
-            client = NewClient(PulsarAddress)
+            client = NewClient(PulsarAddress).(PulsarClient)
             gomega.Expect(client).ShouldNot(gomega.BeNil())
         })
 

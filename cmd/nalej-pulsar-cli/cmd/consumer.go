@@ -6,7 +6,7 @@
 package cmd
 
 import (
-    "github.com/nalej/nalej-bus/internal/pulsar-comcast"
+    "github.com/nalej/nalej-bus/pkg/bus/pulsar-comcast"
     "github.com/rs/zerolog/log"
     "github.com/spf13/cobra"
 )

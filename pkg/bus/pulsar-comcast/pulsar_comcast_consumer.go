@@ -8,7 +8,7 @@ import (
     "context"
     "github.com/Comcast/pulsar-client-go"
     "github.com/nalej/derrors"
-    "github.com/nalej/nalej-bus/internal/bus"
+    "github.com/nalej/nalej-bus/pkg/bus"
     "time"
 )
 

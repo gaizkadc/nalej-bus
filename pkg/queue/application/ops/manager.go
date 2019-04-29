@@ -5,13 +5,11 @@
 package ops
 
 import (
-    "fmt"
-    "github.com/golang/protobuf/proto"
     "github.com/nalej/derrors"
     "github.com/nalej/grpc-bus-go"
     "github.com/nalej/grpc-conductor-go"
-    "github.com/nalej/nalej-bus/internal/bus"
-    "github.com/nalej/nalej-bus/internal/queue"
+    "github.com/nalej/nalej-bus/pkg/bus"
+    "github.com/nalej/nalej-bus/pkg/queue"
 )
 
 const (
@@ -72,9 +70,16 @@ func (m ApplicationOpsProducer) SendUndeployRequest(req grpc_conductor_go.Undepl
 
 
 // Application consumer
-
 type ApplicationOpsConsumer struct {
     consumer bus.NalejConsumer
+}
+
+// Struct designed to config a consumer defining what actions to perform depending on the incoming object.
+type ConfigApplicationOpsConsumer struct {
+    // function to process deployment requests
+    fDeploymentReq func(in grpc_conductor_go.DeploymentRequest)()
+    // function to process undeploy requests
+    fUndeployReq func(in grpc_conductor_go.UndeployRequest)()
 }
 
 func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool) (*ApplicationOpsConsumer, derrors.Error) {
@@ -87,6 +92,7 @@ func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive b
 
 }
 
+/*
 // Consume any of the potential objects
 func (c ApplicationOpsConsumer) Consume() (proto.Message, interface{}, derrors.Error) {
     msg, err := c.consumer.Receive()
@@ -103,7 +109,8 @@ func (c ApplicationOpsConsumer) Consume() (proto.Message, interface{}, derrors.E
 
     switch x := target.Operation.(type) {
     case *grpc_bus_go.ApplicationOps_DeployRequest:
-        return x.DeployRequest, grpc_conductor_go.DeploymentRequest.ProtoMessage, nil
+
+        //return x.DeployRequest, grpc_conductor_go.DeploymentRequest.ProtoMessage, nil
     case *grpc_bus_go.ApplicationOps_UndeployRequest:
         return x.UndeployRequest, grpc_conductor_go.DeploymentRequest.ProtoMessage, nil
     case nil:
@@ -112,3 +119,4 @@ func (c ApplicationOpsConsumer) Consume() (proto.Message, interface{}, derrors.E
         return nil, nil, derrors.NewInternalError(fmt.Sprintf("Profile.Avatar has unexpected type %T", x))
     }
 }
+*/
