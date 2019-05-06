@@ -74,9 +74,9 @@ type ApplicationOpsConsumer struct {
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
 type ConfigApplicationOpsConsumer struct {
     // channel to receive deployment requests
-    ChDeploymentRequest chan<- *grpc_conductor_go.DeploymentRequest
+    ChDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
     // channel to receive undeploy requests
-    ChUndeployRequest chan<- *grpc_conductor_go.UndeployRequest
+    ChUndeployRequest chan *grpc_conductor_go.UndeployRequest
 }
 
 // Create a new configuration structure for a given channel size
@@ -85,8 +85,8 @@ type ConfigApplicationOpsConsumer struct {
 // return:
 //  instance of a configuration object
 func NewConfigApplicationOpsConsumer(size int) ConfigApplicationOpsConsumer {
-    chDeploymentRequest := make(chan<- *grpc_conductor_go.DeploymentRequest, size)
-    chUndeployRequest := make(chan<- *grpc_conductor_go.UndeployRequest, size)
+    chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest, size)
+    chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest, size)
     return ConfigApplicationOpsConsumer{
         ChDeploymentRequest: chDeploymentRequest,
         ChUndeployRequest: chUndeployRequest,
