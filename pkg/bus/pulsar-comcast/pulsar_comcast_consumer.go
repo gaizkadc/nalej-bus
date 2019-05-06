@@ -44,6 +44,8 @@ func (c PulsarConsumer) Receive() ([]byte, derrors.Error) {
         return nil, derrors.NewInternalError("failed receiving message", err)
     }
 
+    ctx, cancel2 := context.WithTimeout(context.Background(), NalejPulsarReceiveTimeout * time.Second)
+    defer cancel2()
     err = c.consumer.Ack(ctx, msg)
     if err != nil {
         return nil, derrors.NewInternalError("impossible to acknowledge message", err)
