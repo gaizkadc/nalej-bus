@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    InfrastructureOpsTopic="nalej/infrastructure/ops"
+    ApplicationOpsTopic="nalej/application/ops"
 )
 
 type ApplicationOpsProducer struct {
@@ -29,7 +29,7 @@ type ApplicationOpsProducer struct {
 // return:
 //  built producer
 func NewApplicationOpsProducer (client bus.NalejClient, name string) (*ApplicationOpsProducer, derrors.Error) {
-    prod, err := client.BuildProducer(name, InfrastructureOpsTopic)
+    prod, err := client.BuildProducer(name, ApplicationOpsTopic)
     if err != nil {
         return nil, err
     }
@@ -94,7 +94,7 @@ func NewConfigApplicationOpsConsumer(size int) ConfigApplicationOpsConsumer {
 }
 
 func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
-    consumer, err := client.BuildConsumer(name, InfrastructureOpsTopic, exclusive)
+    consumer, err := client.BuildConsumer(name, ApplicationOpsTopic, exclusive)
     if err != nil {
         return nil, err
     }
