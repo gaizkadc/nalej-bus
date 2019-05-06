@@ -9,6 +9,7 @@ import (
     "github.com/Comcast/pulsar-client-go"
     "github.com/nalej/derrors"
     "github.com/nalej/nalej-bus/pkg/bus"
+    "github.com/rs/zerolog/log"
     "time"
 )
 
@@ -41,12 +42,13 @@ func (c PulsarConsumer) Receive() ([]byte, derrors.Error) {
     defer cancel()
     msg, err := c.consumer.Receive(ctx)
     if err != nil {
+        log.Error().Err(err).Msg("Nalej bus has")
         return nil, derrors.NewInternalError("failed receiving message", err)
     }
 
-    ctx, cancel2 := context.WithTimeout(context.Background(), NalejPulsarReceiveTimeout * time.Second)
+    ctx2, cancel2 := context.WithTimeout(context.Background(), NalejPulsarReceiveTimeout * time.Second)
     defer cancel2()
-    err = c.consumer.Ack(ctx, msg)
+    err = c.consumer.Ack(ctx2, msg)
     if err != nil {
         return nil, derrors.NewInternalError("impossible to acknowledge message", err)
     }
