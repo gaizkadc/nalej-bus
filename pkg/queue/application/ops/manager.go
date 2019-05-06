@@ -79,6 +79,20 @@ type ConfigApplicationOpsConsumer struct {
     ChUndeployRequest chan *grpc_conductor_go.UndeployRequest
 }
 
+// Create a new configuration structure for a given channel size
+// params:
+//  size of channels
+// return:
+//  instance of a configuration object
+func NewConfigApplicationOpsConsumer(size int) ConfigApplicationOpsConsumer {
+    chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest)
+    chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest)
+    return ConfigApplicationOpsConsumer{
+        ChDeploymentRequest: chDeploymentRequest,
+        ChUndeployRequest: chUndeployRequest,
+    }
+}
+
 func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
     consumer, err := client.BuildConsumer(name, InfrastructureOpsTopic, exclusive)
     if err != nil {
