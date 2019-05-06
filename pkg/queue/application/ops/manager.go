@@ -74,9 +74,9 @@ type ApplicationOpsConsumer struct {
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
 type ConfigApplicationOpsConsumer struct {
     // channel to receive deployment requests
-    chDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
+    ChDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
     // channel to receive undeploy requests
-    chUndeployRequest chan *grpc_conductor_go.UndeployRequest
+    ChUndeployRequest chan *grpc_conductor_go.UndeployRequest
 }
 
 func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
@@ -105,9 +105,9 @@ func (c ApplicationOpsConsumer) Consume() derrors.Error{
 
     switch x := target.Operation.(type) {
     case *grpc_bus_go.ApplicationOps_DeployRequest:
-        c.config.chDeploymentRequest <- x.DeployRequest
+        c.config.ChDeploymentRequest <- x.DeployRequest
     case *grpc_bus_go.ApplicationOps_UndeployRequest:
-        c.config.chUndeployRequest <- x.UndeployRequest
+        c.config.ChUndeployRequest <- x.UndeployRequest
     case nil:
         errMsg := "received nil entry"
         log.Error().Msg(errMsg)
