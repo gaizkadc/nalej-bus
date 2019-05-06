@@ -74,9 +74,9 @@ type ApplicationOpsConsumer struct {
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
 type ConfigApplicationOpsConsumer struct {
     // channel to receive deployment requests
-    ChDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
+    ChDeploymentRequest chan<- *grpc_conductor_go.DeploymentRequest
     // channel to receive undeploy requests
-    ChUndeployRequest chan *grpc_conductor_go.UndeployRequest
+    ChUndeployRequest chan<- *grpc_conductor_go.UndeployRequest
 }
 
 // Create a new configuration structure for a given channel size
@@ -85,8 +85,8 @@ type ConfigApplicationOpsConsumer struct {
 // return:
 //  instance of a configuration object
 func NewConfigApplicationOpsConsumer(size int) ConfigApplicationOpsConsumer {
-    chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest, size)
-    chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest, size)
+    chDeploymentRequest := make(chan<- *grpc_conductor_go.DeploymentRequest, size)
+    chUndeployRequest := make(chan<- *grpc_conductor_go.UndeployRequest, size)
     return ConfigApplicationOpsConsumer{
         ChDeploymentRequest: chDeploymentRequest,
         ChUndeployRequest: chUndeployRequest,
@@ -99,13 +99,13 @@ func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive b
         return nil, err
     }
 
-    return &ApplicationOpsConsumer{consumer: consumer,config: config}, nil
+    return &ApplicationOpsConsumer{Consumer: consumer,Config: config}, nil
 }
 
 
 // Consume any of the possible objects that can be sent to this queue and send it to the corresponding channel.
 func (c ApplicationOpsConsumer) Consume() derrors.Error{
-    msg, err := c.consumer.Receive()
+    msg, err := c.Consumer.Receive()
     if err != nil {
         return err
     }
@@ -119,9 +119,9 @@ func (c ApplicationOpsConsumer) Consume() derrors.Error{
 
     switch x := target.Operation.(type) {
     case *grpc_bus_go.ApplicationOps_DeployRequest:
-        c.config.ChDeploymentRequest <- x.DeployRequest
+        c.Config.ChDeploymentRequest <- x.DeployRequest
     case *grpc_bus_go.ApplicationOps_UndeployRequest:
-        c.config.ChUndeployRequest <- x.UndeployRequest
+        c.Config.ChUndeployRequest <- x.UndeployRequest
     case nil:
         errMsg := "received nil entry"
         log.Error().Msg(errMsg)
