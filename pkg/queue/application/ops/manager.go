@@ -85,8 +85,8 @@ type ConfigApplicationOpsConsumer struct {
 // return:
 //  instance of a configuration object
 func NewConfigApplicationOpsConsumer(size int) ConfigApplicationOpsConsumer {
-    chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest)
-    chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest)
+    chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest, size)
+    chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest, size)
     return ConfigApplicationOpsConsumer{
         ChDeploymentRequest: chDeploymentRequest,
         ChUndeployRequest: chUndeployRequest,
