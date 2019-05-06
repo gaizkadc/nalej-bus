@@ -67,8 +67,8 @@ func (m ApplicationOpsProducer) Send(msg proto.Message) derrors.Error {
 
 // Application consumer
 type ApplicationOpsConsumer struct {
-    consumer bus.NalejConsumer
-    config ConfigApplicationOpsConsumer
+    Consumer bus.NalejConsumer
+    Config ConfigApplicationOpsConsumer
 }
 
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
