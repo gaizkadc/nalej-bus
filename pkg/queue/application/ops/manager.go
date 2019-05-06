@@ -109,11 +109,13 @@ func (c ApplicationOpsConsumer) Consume() derrors.Error{
     case *grpc_bus_go.ApplicationOps_UndeployRequest:
         c.config.chUndeployRequest <- x.UndeployRequest
     case nil:
-        log.Error().Msg("received nil entry")
-        return derrors.NewInvalidArgumentError("received nil entry from infrastructure ops")
+        errMsg := "received nil entry"
+        log.Error().Msg(errMsg)
+        return derrors.NewInvalidArgumentError(errMsg)
     default:
-        log.Error().Interface("type",x).Msg("unknown object type in infrastructure ops")
-        return derrors.NewInvalidArgumentError("unknown object type in infrastructure ops")
+        errMsg := "unknown object type in infrastructure ops"
+        log.Error().Interface("type",x).Msg(erMsg)
+        return derrors.NewInvalidArgumentError(errMsg)
     }
     return nil
 }
