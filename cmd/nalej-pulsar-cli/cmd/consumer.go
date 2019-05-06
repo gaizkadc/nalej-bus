@@ -6,9 +6,11 @@
 package cmd
 
 import (
+    "context"
     "github.com/nalej/nalej-bus/pkg/bus/pulsar-comcast"
     "github.com/rs/zerolog/log"
     "github.com/spf13/cobra"
+    "time"
 )
 
 // producerTopic name
@@ -41,11 +43,14 @@ func runConsumer () {
     if error!=nil{
         log.Panic().Err(error).Msg("impossible to build consumer")
     }
-
-    defer consumer.Close()
+    ctx,cancel := context.WithTimeout(context.Background(), time.Second * 5)
+    defer consumer.Close(ctx)
+    cancel()
 
     for {
-        msg, err := consumer.Receive()
+        ctx,cancel := context.WithTimeout(context.Background(), time.Second * 10)
+        msg, err := consumer.Receive(ctx)
+        cancel()
         if err != nil {
             log.Error().Err(err)
         } else {
@@ -53,8 +58,6 @@ func runConsumer () {
         }
 
     }
-
-
 
 }
 

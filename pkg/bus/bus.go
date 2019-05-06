@@ -5,6 +5,7 @@
 package bus
 
 import (
+    "context"
     "github.com/nalej/derrors"
 )
 
@@ -34,15 +35,19 @@ type NalejClient interface {
 // Main interfaces to be implemented by any producer or consumer in the Nalej platform
 type NalejConsumer interface {
     // Receive a message from a subscribed entry
+    // params:
+    //  ctx context
     // return:
     //  message payload
     //  error if any
-    Receive() ([]byte, derrors.Error)
+    Receive(ctx context.Context) ([]byte, derrors.Error)
 
     // Close the consumer
+    // params:
+    //  ctx context
     // return:
     //  error if any
-    Close() derrors.Error
+    Close(ctx context.Context) derrors.Error
 }
 
 type NalejProducer interface {
@@ -50,12 +55,15 @@ type NalejProducer interface {
     // Send a new message to the topic of this producer.
     // params:
     //  msg message to be sent
+    //  ctx context
     // return:
     //  error if any
-    Send(msg []byte) derrors.Error
+    Send(msg []byte, ctx context.Context) derrors.Error
 
     // Close the producer. This operation must close any connection with brokers with an established connection.
+    // params:
+    //  ctx context
     // return:
     //  error if any
-    Close() derrors.Error
+    Close(ctx context.Context) derrors.Error
 }

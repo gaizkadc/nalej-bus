@@ -5,6 +5,7 @@
 package cmd
 
 import (
+    "context"
     "fmt"
     "github.com/nalej/nalej-bus/pkg/bus/pulsar-comcast"
     "github.com/rs/zerolog/log"
@@ -41,7 +42,9 @@ func runProducer() {
         log.Panic().Err(error).Msg("Impossible to build producer")
     }
 
-    defer producer.Close()
+    ctx,cancel := context.WithTimeout(context.Background(), time.Second * 5)
+    defer producer.Close(ctx)
+    cancel()
 
     counter := 0
     tick := time.Tick(time.Second)
@@ -49,7 +52,9 @@ func runProducer() {
         select {
             case <- tick:
                 msg := fmt.Sprintf("Message number %d", counter)
-                err := producer.Send([]byte(msg))
+                ctx, cancel = context.WithTimeout(context.Background(), time.Second * 5)
+                err := producer.Send([]byte(msg), ctx)
+                cancel()
                 if err != nil {
                     log.Error().Err(err).Msg("")
                 } else {

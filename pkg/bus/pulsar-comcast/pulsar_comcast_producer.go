@@ -39,15 +39,7 @@ func NewPulsarProducer(client PulsarClient, name string, topic string) bus.Nalej
     return PulsarProducer{producer: producer}
 }
 
-// Send a new message to the topic of this producer.
-// params:
-//  msg message to be sent
-// return:
-//  error if any
-func(p PulsarProducer) Send(msg []byte) derrors.Error {
-    ctx, cancel := context.WithTimeout(context.Background(), time.Second * NalejPulsarSendTimeout)
-    defer cancel()
-
+func(p PulsarProducer) Send(msg []byte, ctx context.Context) derrors.Error {
     _, err := p.producer.Send(ctx, msg)
 
     if err != nil {
@@ -60,9 +52,7 @@ func(p PulsarProducer) Send(msg []byte) derrors.Error {
 // Close the producer. This operation must close any connection with brokers with an established connection.
 // return:
 //  error if any
-func (p PulsarProducer) Close() derrors.Error {
-    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-    defer cancel()
+func (p PulsarProducer) Close(ctx context.Context) derrors.Error {
     err := p.producer.Close(ctx)
     if err != nil {
         return derrors.NewInternalError("impossible to close producer", err)
