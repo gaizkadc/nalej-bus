@@ -99,7 +99,7 @@ func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive b
         return nil, err
     }
 
-    return &ApplicationOpsConsumer{consumer: consumer}, nil
+    return &ApplicationOpsConsumer{consumer: consumer,config: config}, nil
 }
 
 
@@ -128,7 +128,7 @@ func (c ApplicationOpsConsumer) Consume() derrors.Error{
         return derrors.NewInvalidArgumentError(errMsg)
     default:
         errMsg := "unknown object type in infrastructure ops"
-        log.Error().Interface("type",x).Msg(erMsg)
+        log.Error().Interface("type",x).Msg(errMsg)
         return derrors.NewInvalidArgumentError(errMsg)
     }
     return nil
