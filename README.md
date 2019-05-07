@@ -92,7 +92,7 @@ In a second terminal run the consumer:
 
 The following example describes a simple sender/consumer scenario.
 ```go
-import "github.com/nalej/nalej-bus/internal/pulsar-comcast"
+import pkg
 
 // Create a client with the Pulsar address
 client := pulsar_comcast.NewClient("localhost:6550")

@@ -8,13 +8,13 @@ import (
     "context"
     "github.com/Comcast/pulsar-client-go"
     "github.com/nalej/derrors"
-    "github.com/nalej/nalej-bus/internal/bus"
+    "github.com/nalej/nalej-bus/pkg/bus"
     "time"
 )
 
 const (
     // Number of seconds to wait before we consider a timeout for a receive operation
-    NalejPulsarReceiveTimeout = 2
+    NalejPulsarReceiveACKTimeout = 2
 )
 
 type PulsarConsumer struct {
@@ -36,14 +36,14 @@ func NewPulsarConsumer(client PulsarClient, name string, topic string, exclusive
 // return:
 //  message payload
 //  error if any
-func (c PulsarConsumer) Receive() ([]byte, derrors.Error) {
-    ctx, cancel := context.WithTimeout(context.Background(), NalejPulsarReceiveTimeout * time.Second)
-    defer cancel()
+func (c PulsarConsumer) Receive(ctx context.Context) ([]byte, derrors.Error) {
     msg, err := c.consumer.Receive(ctx)
     if err != nil {
         return nil, derrors.NewInternalError("failed receiving message", err)
     }
 
+    ctx, cancel := context.WithTimeout(context.Background(), NalejPulsarReceiveACKTimeout * time.Second)
+    defer cancel()
     err = c.consumer.Ack(ctx, msg)
     if err != nil {
         return nil, derrors.NewInternalError("impossible to acknowledge message", err)
@@ -54,9 +54,7 @@ func (c PulsarConsumer) Receive() ([]byte, derrors.Error) {
 // Close the consumer
 // return:
 //  error if any
-func (c PulsarConsumer) Close() derrors.Error {
-    ctx, cancel := context.WithTimeout(context.Background(), NalejPulsarReceiveTimeout * time.Second)
-    defer cancel()
+func (c PulsarConsumer) Close(ctx context.Context) derrors.Error {
     err := c.consumer.Close(ctx)
     if err != nil {
         return derrors.NewInternalError("impossible to close consumer", err)
