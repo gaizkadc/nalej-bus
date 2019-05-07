@@ -58,7 +58,7 @@ type NalejProducer interface {
     //  ctx context
     // return:
     //  error if any
-    Send(msg []byte, ctx context.Context) derrors.Error
+    Send(ctx context.Context, msg []byte) derrors.Error
 
     // Close the producer. This operation must close any connection with brokers with an established connection.
     // params:

@@ -53,7 +53,7 @@ func runProducer() {
             case <- tick:
                 msg := fmt.Sprintf("Message number %d", counter)
                 ctx, cancel = context.WithTimeout(context.Background(), time.Second * 5)
-                err := producer.Send([]byte(msg), ctx)
+                err := producer.Send(ctx,[]byte(msg))
                 cancel()
                 if err != nil {
                     log.Error().Err(err).Msg("")

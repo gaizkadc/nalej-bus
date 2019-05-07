@@ -67,7 +67,7 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
 
             // produce something
             ctx,cancel := context.WithTimeout(context.Background(), time.Second * SendTimeout)
-            err = prod.Send([]byte(msg), ctx)
+            err = prod.Send(ctx, []byte(msg))
             cancel()
             gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error sending message")
 

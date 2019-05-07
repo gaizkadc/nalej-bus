@@ -38,7 +38,7 @@ func NewApplicationOpsProducer (client bus.NalejClient, name string) (*Applicati
 }
 
 // Generic function that decides what to send depending on the object type.
-func (m ApplicationOpsProducer) Send(msg proto.Message, ctx context.Context) derrors.Error {
+func (m ApplicationOpsProducer) Send(ctx context.Context, msg proto.Message) derrors.Error {
 
     var  wrapper grpc_bus_go.ApplicationOps
 
@@ -56,7 +56,7 @@ func (m ApplicationOpsProducer) Send(msg proto.Message, ctx context.Context) der
         return err
     }
 
-    err = m.producer.Send(payload, ctx)
+    err = m.producer.Send(ctx, payload)
     if err != nil {
         return err
     }

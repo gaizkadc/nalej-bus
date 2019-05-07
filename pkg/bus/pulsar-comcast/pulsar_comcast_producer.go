@@ -39,7 +39,7 @@ func NewPulsarProducer(client PulsarClient, name string, topic string) bus.Nalej
     return PulsarProducer{producer: producer}
 }
 
-func(p PulsarProducer) Send(msg []byte, ctx context.Context) derrors.Error {
+func(p PulsarProducer) Send(ctx context.Context, msg []byte) derrors.Error {
     _, err := p.producer.Send(ctx, msg)
 
     if err != nil {
