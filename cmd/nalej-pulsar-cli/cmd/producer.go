@@ -5,8 +5,9 @@
 package cmd
 
 import (
+    "context"
     "fmt"
-    "github.com/nalej/nalej-bus/internal/pulsar-comcast"
+    "github.com/nalej/nalej-bus/pkg/bus/pulsar-comcast"
     "github.com/rs/zerolog/log"
     "github.com/spf13/cobra"
     "time"
@@ -36,9 +37,14 @@ func init() {
 func runProducer() {
     client := pulsar_comcast.NewClient(pulsarAddress)
 
-    producer := pulsar_comcast.NewPulsarProducer(client, producerName, producerTopic)
+    producer, error := client.BuildProducer(producerName, producerTopic)
+    if error != nil {
+        log.Panic().Err(error).Msg("Impossible to build producer")
+    }
 
-    defer producer.Close()
+    ctx,cancel := context.WithTimeout(context.Background(), time.Second * 5)
+    defer producer.Close(ctx)
+    cancel()
 
     counter := 0
     tick := time.Tick(time.Second)
@@ -46,7 +52,9 @@ func runProducer() {
         select {
             case <- tick:
                 msg := fmt.Sprintf("Message number %d", counter)
-                err := producer.Send([]byte(msg))
+                ctx, cancel = context.WithTimeout(context.Background(), time.Second * 5)
+                err := producer.Send(ctx,[]byte(msg))
+                cancel()
                 if err != nil {
                     log.Error().Err(err).Msg("")
                 } else {

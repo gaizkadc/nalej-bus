@@ -5,13 +5,18 @@
 package pulsar_comcast
 
 import (
+    "context"
     "github.com/nalej/derrors"
-    "github.com/nalej/nalej-bus/internal/bus"
-    "github.com/nalej/nalej-bus/internal/utils"
+    "github.com/nalej/nalej-bus/pkg/bus"
+    "github.com/nalej/nalej-bus/pkg/utils"
     "github.com/onsi/ginkgo"
     "github.com/onsi/gomega"
     "os"
     "time"
+)
+
+const(
+    SendTimeout = 2
 )
 
 var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
@@ -40,7 +45,7 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
 
         ginkgo.BeforeEach(func(){
             //create client
-            client = NewClient(PulsarAddress)
+            client = NewClient(PulsarAddress).(PulsarClient)
             gomega.Expect(client).ShouldNot(gomega.BeNil())
         })
 
@@ -61,7 +66,9 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
             go receive(cons, received_ch)
 
             // produce something
-            err = prod.Send([]byte(msg))
+            ctx,cancel := context.WithTimeout(context.Background(), time.Second * SendTimeout)
+            err = prod.Send(ctx, []byte(msg))
+            cancel()
             gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error sending message")
 
             // In one second this should arrive
@@ -70,9 +77,14 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
             received := <-received_ch
             gomega.Expect(string(received)).Should(gomega.Equal(msg))
 
-            err = prod.Close()
+            ctx,cancel = context.WithTimeout(context.Background(), time.Second * SendTimeout)
+            err = prod.Close(ctx)
+            cancel()
             gomega.Expect(err).ShouldNot(gomega.HaveOccurred(),"error closing producer")
-            err = cons.Close()
+
+            ctx,cancel = context.WithTimeout(context.Background(), time.Second * SendTimeout)
+            err = cons.Close(ctx)
+            cancel()
             gomega.Expect(err).ShouldNot(gomega.HaveOccurred(),"error closing consumer")
 
         })
@@ -81,7 +93,9 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
 
 // Helping function using a channel to return results
 func receive(cons bus.NalejConsumer, ch chan <- []byte)  {
-    received, err := cons.Receive()
+    ctx,cancel := context.WithTimeout(context.Background(), time.Second * SendTimeout)
+    received, err := cons.Receive(ctx)
+    cancel()
     gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error receiving message")
 
     ch <- received
