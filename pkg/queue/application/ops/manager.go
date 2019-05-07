@@ -5,6 +5,7 @@
 package ops
 
 import (
+    "context"
     "github.com/golang/protobuf/proto"
     "github.com/nalej/derrors"
     "github.com/nalej/grpc-bus-go"
@@ -37,7 +38,7 @@ func NewApplicationOpsProducer (client bus.NalejClient, name string) (*Applicati
 }
 
 // Generic function that decides what to send depending on the object type.
-func (m ApplicationOpsProducer) Send(msg proto.Message) derrors.Error {
+func (m ApplicationOpsProducer) Send(msg proto.Message, ctx context.Context) derrors.Error {
 
     var  wrapper grpc_bus_go.ApplicationOps
 
@@ -55,7 +56,7 @@ func (m ApplicationOpsProducer) Send(msg proto.Message) derrors.Error {
         return err
     }
 
-    err = m.producer.Send(payload)
+    err = m.producer.Send(payload, ctx)
     if err != nil {
         return err
     }
@@ -104,8 +105,8 @@ func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive b
 
 
 // Consume any of the possible objects that can be sent to this queue and send it to the corresponding channel.
-func (c ApplicationOpsConsumer) Consume() derrors.Error{
-    msg, err := c.Consumer.Receive()
+func (c ApplicationOpsConsumer) Consume(ctx context.Context) derrors.Error{
+    msg, err := c.Consumer.Receive(ctx)
     if err != nil {
         return err
     }
