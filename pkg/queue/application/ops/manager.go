@@ -78,6 +78,8 @@ type ConfigApplicationOpsConsumer struct {
     ChDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
     // channel to receive undeploy requests
     ChUndeployRequest chan *grpc_conductor_go.UndeployRequest
+    // object types to be considered for consumption
+    ToConsume ConsumableStructsApplicationOpsConsumer
 }
 
 // Create a new configuration structure for a given channel size
@@ -85,13 +87,22 @@ type ConfigApplicationOpsConsumer struct {
 //  size of channels
 // return:
 //  instance of a configuration object
-func NewConfigApplicationOpsConsumer(size int) ConfigApplicationOpsConsumer {
+func NewConfigApplicationOpsConsumer(size int, toConsume ConsumableStructsApplicationOpsConsumer) ConfigApplicationOpsConsumer {
     chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest, size)
     chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest, size)
     return ConfigApplicationOpsConsumer{
         ChDeploymentRequest: chDeploymentRequest,
         ChUndeployRequest: chUndeployRequest,
+        ToConsume: toConsume,
     }
+}
+
+// Data struct indicating what data structures available in this topic will be accepted.
+type ConsumableStructsApplicationOpsConsumer struct {
+    // Consume deploy requests
+    DeployRequest bool
+    // Consume undeploy requests
+    UndeployRequest bool
 }
 
 func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
@@ -120,9 +131,13 @@ func (c ApplicationOpsConsumer) Consume(ctx context.Context) derrors.Error{
 
     switch x := target.Operation.(type) {
     case *grpc_bus_go.ApplicationOps_DeployRequest:
-        c.Config.ChDeploymentRequest <- x.DeployRequest
+        if  c.Config.ToConsume.DeployRequest {
+            c.Config.ChDeploymentRequest <- x.DeployRequest
+        }
     case *grpc_bus_go.ApplicationOps_UndeployRequest:
-        c.Config.ChUndeployRequest <- x.UndeployRequest
+        if c.Config.ToConsume.UndeployRequest {
+            c.Config.ChUndeployRequest <- x.UndeployRequest
+        }
     case nil:
         errMsg := "received nil entry"
         log.Error().Msg(errMsg)
