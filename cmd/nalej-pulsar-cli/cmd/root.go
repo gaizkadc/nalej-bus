@@ -21,7 +21,7 @@ var consoleLogging bool
 
 
 var RootCmd = &cobra.Command{
-    Use: "nalej-pulsar-cli",
+    Use: "nalej-pulsar-cli-legacy",
     Short: "Pulsar client",
     Long: "Example of a Nalej client for a Pulsar message queue",
     Version: "unknown-version",

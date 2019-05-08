@@ -1,8 +1,8 @@
 variables: 
   - name: appList
-    value: 'nalej-pulsar-cli'  # Space separated list of apps to build
+    value: ''  # Space separated list of apps to build
   - name: imageList
-    value: 'nalej-pulsar-cli nalej-bus-pulsar-client' # Space separated list of docker images to build
+    value: 'nalej-bus-pulsar-client' # Space separated list of docker images to build
   - group: common-vars
   - group: slack-webhooks
   - group: docker-registries
