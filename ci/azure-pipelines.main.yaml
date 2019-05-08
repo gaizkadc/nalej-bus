@@ -1,4 +1,6 @@
 variables: 
+  - name: appList
+    value: ''  # Space separated list of apps to build
   - name: imageList
     value: 'nalej-bus-pulsar-client' # Space separated list of docker images to build
   - group: common-vars
