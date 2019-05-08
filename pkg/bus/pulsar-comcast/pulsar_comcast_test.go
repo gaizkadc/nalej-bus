@@ -44,6 +44,11 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
 
 
         ginkgo.BeforeEach(func(){
+            if !isReady {
+                ginkgo.Skip("no integration test set")
+                return
+            }
+
             //create client
             client = NewClient(PulsarAddress).(PulsarClient)
             gomega.Expect(client).ShouldNot(gomega.BeNil())
@@ -51,6 +56,12 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
 
 
         ginkgo.It("produce and consume with the same client", func(){
+
+            if !isReady {
+                ginkgo.Skip("no integration test set")
+                return
+            }
+
             // create producer
             prod := NewPulsarProducer(client, "prod1", "public/default/topic")
             gomega.Expect(prod).ShouldNot(gomega.BeNil())
