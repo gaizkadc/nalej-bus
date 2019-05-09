@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2018 Nalej - All Rights Reserved
+ * Copyright (C) 2019 Nalej - All Rights Reserved
  */
 
 package ops
 
 import (
     "context"
+    "fmt"
     "github.com/golang/protobuf/proto"
     "github.com/nalej/derrors"
     "github.com/nalej/grpc-bus-go"
@@ -47,8 +48,6 @@ func (m ApplicationOpsProducer) Send(ctx context.Context, msg proto.Message) der
         wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_DeployRequest{x}}
     case *grpc_conductor_go.UndeployRequest:
         wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_UndeployRequest{x}}
-    case *grpc_conductor_go.DrainClusterRequest:
-        wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_DrainRequest{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -80,8 +79,6 @@ type ConfigApplicationOpsConsumer struct {
     ChDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
     // channel to receive undeploy requests
     ChUndeployRequest chan *grpc_conductor_go.UndeployRequest
-    // channel to receive drain cluster requests
-    ChDrainClusterRequest chan *grpc_conductor_go.DrainClusterRequest
     // object types to be considered for consumption
     ToConsume ConsumableStructsApplicationOpsConsumer
 }
@@ -94,11 +91,9 @@ type ConfigApplicationOpsConsumer struct {
 func NewConfigApplicationOpsConsumer(size int, toConsume ConsumableStructsApplicationOpsConsumer) ConfigApplicationOpsConsumer {
     chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest, size)
     chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest, size)
-    chDrainClusterRequest := make(chan *grpc_conductor_go.DrainClusterRequest, size)
     return ConfigApplicationOpsConsumer{
         ChDeploymentRequest: chDeploymentRequest,
         ChUndeployRequest: chUndeployRequest,
-        ChDrainClusterRequest: chDrainClusterRequest,
         ToConsume: toConsume,
     }
 }
@@ -109,8 +104,6 @@ type ConsumableStructsApplicationOpsConsumer struct {
     DeployRequest bool
     // Consume undeploy requests
     UndeployRequest bool
-    // Drain request
-    DrainClusterRequest bool
 }
 
 func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
@@ -146,16 +139,12 @@ func (c ApplicationOpsConsumer) Consume(ctx context.Context) derrors.Error{
         if c.Config.ToConsume.UndeployRequest {
             c.Config.ChUndeployRequest <- x.UndeployRequest
         }
-    case *grpc_bus_go.ApplicationOps_DrainRequest:
-        if c.Config.ToConsume.DrainClusterRequest {
-            c.Config.ChDrainClusterRequest <- x.DrainRequest
-        }
     case nil:
         errMsg := "received nil entry"
         log.Error().Msg(errMsg)
         return derrors.NewInvalidArgumentError(errMsg)
     default:
-        errMsg := "unknown object type in infrastructure ops"
+        errMsg := fmt.Sprintf("unknown object type in %s",ApplicationOpsTopic)
         log.Error().Interface("type",x).Msg(errMsg)
         return derrors.NewInvalidArgumentError(errMsg)
     }
