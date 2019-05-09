@@ -47,6 +47,8 @@ func (m ApplicationOpsProducer) Send(ctx context.Context, msg proto.Message) der
         wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_DeployRequest{x}}
     case *grpc_conductor_go.UndeployRequest:
         wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_UndeployRequest{x}}
+    case *grpc_conductor_go.DrainClusterRequest:
+        wrapper = grpc_bus_go.ApplicationOps{ Operation: &grpc_bus_go.ApplicationOps_DrainRequest{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -78,6 +80,8 @@ type ConfigApplicationOpsConsumer struct {
     ChDeploymentRequest chan *grpc_conductor_go.DeploymentRequest
     // channel to receive undeploy requests
     ChUndeployRequest chan *grpc_conductor_go.UndeployRequest
+    // channel to receive drain cluster requests
+    ChDrainClusterRequest chan *grpc_conductor_go.DrainClusterRequest
     // object types to be considered for consumption
     ToConsume ConsumableStructsApplicationOpsConsumer
 }
@@ -90,9 +94,11 @@ type ConfigApplicationOpsConsumer struct {
 func NewConfigApplicationOpsConsumer(size int, toConsume ConsumableStructsApplicationOpsConsumer) ConfigApplicationOpsConsumer {
     chDeploymentRequest := make(chan *grpc_conductor_go.DeploymentRequest, size)
     chUndeployRequest := make(chan *grpc_conductor_go.UndeployRequest, size)
+    chDrainClusterRequest := make(chan *grpc_conductor_go.DrainClusterRequest, size)
     return ConfigApplicationOpsConsumer{
         ChDeploymentRequest: chDeploymentRequest,
         ChUndeployRequest: chUndeployRequest,
+        ChDrainClusterRequest: chDrainClusterRequest,
         ToConsume: toConsume,
     }
 }
@@ -103,6 +109,8 @@ type ConsumableStructsApplicationOpsConsumer struct {
     DeployRequest bool
     // Consume undeploy requests
     UndeployRequest bool
+    // Drain request
+    DrainClusterRequest bool
 }
 
 func NewApplicationOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
@@ -137,6 +145,10 @@ func (c ApplicationOpsConsumer) Consume(ctx context.Context) derrors.Error{
     case *grpc_bus_go.ApplicationOps_UndeployRequest:
         if c.Config.ToConsume.UndeployRequest {
             c.Config.ChUndeployRequest <- x.UndeployRequest
+        }
+    case *grpc_bus_go.ApplicationOps_DrainRequest:
+        if c.Config.ToConsume.DrainClusterRequest {
+            c.Config.ChDrainClusterRequest <- x.DrainRequest
         }
     case nil:
         errMsg := "received nil entry"

@@ -74,12 +74,12 @@
   version = "v0.0.47"
 
 [[projects]]
-  digest = "1:c64e8299f942d00785d7129c4a2b65d319924d0e4b323bcc1e7be0a151c296bb"
+  digest = "1:092254bc5f6edffb28eea93e1c6f4de2794c7ba6fca80efff9f339c17fdc18a0"
   name = "github.com/nalej/grpc-bus-go"
   packages = ["."]
   pruneopts = ""
-  revision = "49a94e06cf3a2e091dddd7b1f12d06b58953a927"
-  version = "v0.0.1"
+  revision = "699c5b5bc9d8b3eda43a550a3659ec3146f399ef"
+  version = "v0.0.2"
 
 [[projects]]
   digest = "1:44f7426538411ea9f774f96e3b102decc9f549b188e55e29ecc15be69542a96b"
@@ -90,12 +90,12 @@
   version = "v0.0.30"
 
 [[projects]]
-  digest = "1:1c4e0c8d913747fefcff6c15151bbb30cad22a122b9cf723a04621b20ac3753b"
+  digest = "1:15fe5524a80d9c12c94880bdee65138a41e46bef0ddc16af5d1045b916fc835f"
   name = "github.com/nalej/grpc-conductor-go"
   packages = ["."]
   pruneopts = ""
-  revision = "78140c187266b77930cde36206fd5098bd894284"
-  version = "v0.0.89"
+  revision = "4ca36f8c4967094d15e2f30f7b4b3c9df7aa0f9a"
+  version = "v0.0.90"
 
 [[projects]]
   digest = "1:d7695afbf2039f4c504d7e7b3ded13328f044c85bfab3ea999cc0605aebf8c6b"
