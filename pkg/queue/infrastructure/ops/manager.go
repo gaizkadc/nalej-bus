@@ -99,7 +99,7 @@ type ConsumableStructsInfrastructureOpsConsumer struct {
     DrainRequest bool
 }
 
-func NewInfrastructureOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigInfrastructureOpsConsumer) (*ApplicationOpsConsumer, derrors.Error) {
+func NewInfrastructureOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigInfrastructureOpsConsumer) (*InfrastructureOpsConsumer, derrors.Error) {
     consumer, err := client.BuildConsumer(name, InfrastructureOpsTopic, exclusive)
     if err != nil {
         return nil, err
