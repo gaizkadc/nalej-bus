@@ -9,7 +9,7 @@ metadata:
     app: bookie
 spec:
   serviceName: bookie
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       cluster: management
