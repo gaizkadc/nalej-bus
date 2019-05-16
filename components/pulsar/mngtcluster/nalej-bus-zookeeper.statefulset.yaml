@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper
@@ -10,6 +10,11 @@ metadata:
 spec:
   serviceName: zookeeper
   replicas: 3
+  selector:
+    matchLabels:
+      app: zookeeper
+      component: nalej-bus
+      cluster: management
   template:
     metadata:
       labels:
