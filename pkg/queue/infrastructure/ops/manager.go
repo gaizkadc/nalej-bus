@@ -11,7 +11,6 @@ import (
     "github.com/nalej/derrors"
     "github.com/nalej/grpc-bus-go"
     "github.com/nalej/grpc-conductor-go"
-    "github.com/nalej/grpc-infrastructure-go"
     "github.com/nalej/nalej-bus/pkg/bus"
     "github.com/nalej/nalej-bus/pkg/queue"
     "github.com/rs/zerolog/log"
@@ -47,8 +46,6 @@ func (m InfrastructureOpsProducer) Send(ctx context.Context, msg proto.Message) 
     switch x := msg.(type) {
     case *grpc_conductor_go.DrainClusterRequest:
         wrapper = grpc_bus_go.InfrastructureOps{ Operation: &grpc_bus_go.InfrastructureOps_DrainRequest{x}}
-    case *grpc_infrastructure_go.UpdateClusterRequest:
-        wrapper = grpc_bus_go.InfrastructureOps{Operation: &grpc_bus_go.InfrastructureOps_UpdateClusterRequest{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -78,8 +75,6 @@ type InfrastructureOpsConsumer struct {
 type ConfigInfrastructureOpsConsumer struct {
     // channel to receive drain requests
     ChDrainRequest chan *grpc_conductor_go.DrainClusterRequest
-    // channel to receive update cluster requests
-    ChUpdateClusterRequest chan *grpc_infrastructure_go.UpdateClusterRequest
     // object types to be considered for consumption
     ToConsume ConsumableStructsInfrastructureOpsConsumer
 }
@@ -102,8 +97,6 @@ func NewConfigInfrastructureOpsConsumer(size int, toConsume ConsumableStructsInf
 type ConsumableStructsInfrastructureOpsConsumer struct {
     // Consume drain requests
     DrainRequest bool
-    // Consume update cluster requests
-    UpdateClusterRequest bool
 }
 
 func NewInfrastructureOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigInfrastructureOpsConsumer) (*InfrastructureOpsConsumer, derrors.Error) {
@@ -134,10 +127,6 @@ func (c InfrastructureOpsConsumer) Consume(ctx context.Context) derrors.Error{
     case *grpc_bus_go.InfrastructureOps_DrainRequest:
         if  c.Config.ToConsume.DrainRequest {
             c.Config.ChDrainRequest <- x.DrainRequest
-        }
-    case *grpc_bus_go.InfrastructureOps_UpdateClusterRequest:
-        if c.Config.ToConsume.UpdateClusterRequest {
-            c.Config.ChUpdateClusterRequest <- x.UpdateClusterRequest
         }
     case nil:
         errMsg := "received nil entry"
