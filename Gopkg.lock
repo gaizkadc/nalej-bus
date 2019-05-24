@@ -74,12 +74,12 @@
   version = "v0.0.48"
 
 [[projects]]
-  digest = "1:dfbd22f3d7d09c47c4b2d63f271a9575ddff84bff2a8b746920bbeabcedfbacc"
+  digest = "1:51948f0804900ab39848e91050f06e220f2a1e4fea5852d9657f32fe892a8c2c"
   name = "github.com/nalej/grpc-bus-go"
   packages = ["."]
   pruneopts = ""
-  revision = "752ad79b49b74353e41076ce802adbbed13ab4ad"
-  version = "v0.0.5"
+  revision = "1d22ccbe8c4368e711bac92f4e2b29e89d90711b"
+  version = "v0.0.6"
 
 [[projects]]
   digest = "1:44f7426538411ea9f774f96e3b102decc9f549b188e55e29ecc15be69542a96b"
@@ -370,11 +370,14 @@
     "github.com/nalej/grpc-bus-go",
     "github.com/nalej/grpc-conductor-go",
     "github.com/nalej/grpc-infrastructure-go",
+    "github.com/nalej/grpc-inventory-go",
+    "github.com/nalej/grpc-inventory-manager-go",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/rs/zerolog",
     "github.com/rs/zerolog/log",
     "github.com/spf13/cobra",
+    "golang.org/x/net/context",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
