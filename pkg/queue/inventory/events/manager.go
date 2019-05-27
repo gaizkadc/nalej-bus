@@ -96,6 +96,23 @@ type ConsumableStructsInventoryEventsConsumer struct {
 	EICStartInfo bool
 }
 
+// NewConfigInventoryEventsConsumer creates the underlying channels with a given configuration.
+func NewConfigInventoryEventsConsumer(size int, toConsume ConsumableStructsInventoryEventsConsumer) ConfigInventoryEventsConsumer{
+
+	chAgentIds := make(chan *grpc_inventory_manager_go.AgentIds, size)
+	chEdgeControllerId := make(chan *grpc_inventory_go.EdgeControllerId, size)
+	chEICStart := make(chan *grpc_inventory_manager_go.EICStartInfo, size)
+
+	return ConfigInventoryEventsConsumer{
+		ChAgentIds: chAgentIds,
+		ChEdgeControllerId: chEdgeControllerId,
+		ChEICStart: chEICStart,
+		ToConsume: toConsume,
+	}
+}
+
+// NewInventoryEventsConsumer creates a consumer with a given string and config. Exclusivity determines how many consumer of a given
+// name will receive the message.
 func NewInventoryEventsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigInventoryEventsConsumer) (*InventoryEventsConsumer, derrors.Error) {
 	consumer, err := client.BuildConsumer(name, InventoryEventsTopic, exclusive)
 	if err != nil {
