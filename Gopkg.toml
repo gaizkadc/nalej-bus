@@ -28,11 +28,15 @@
 
 [[constraint]]
     name="github.com/nalej/grpc-bus-go"
-    version="=v0.0.6"
+    version="=v0.0.7"
 
 [[constraint]]
     name="github.com/nalej/grpc-conductor-go"
     version="=v0.0.91"
+
+[[constraint]]
+    name="github.com/nalej/grpc-network-go"
+    version="=v0.0.34"
 
 [[constraint]]
     name="github.com/nalej/grpc-inventory-go"
