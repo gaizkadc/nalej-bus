@@ -81,6 +81,14 @@ type ConfigNetworkOpsConsumer struct {
     ToConsume ConsumableStructsNetworkOpsConsumer
 }
 
+func NewConfigNetworksOpsConsumer(size int, toConsume ConsumableStructsNetworkOpsConsumer) ConfigNetworkOpsConsumer {
+    chAuthorize := make(chan *grpc_network_go.AuthorizeMemberRequest,size)
+    chDisauthorize := make(chan *grpc_network_go.DisauthorizeMemberRequest,size)
+
+    return ConfigNetworkOpsConsumer{ChAuthorizeMembersRequest: chAuthorize,
+        ChDisauthorizeMembersRequest: chDisauthorize,ToConsume: toConsume}
+}
+
 // Data struct indicating what data structures available in this topic will be accepted.
 type ConsumableStructsNetworkOpsConsumer struct {
     // Consume authorize members
