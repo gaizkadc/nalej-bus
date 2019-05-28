@@ -41,10 +41,9 @@ func (m InventoryEventsProducer) Send(ctx context.Context, msg proto.Message) de
 	var  wrapper grpc_bus_go.InventoryEvents
 
 	switch x := msg.(type) {
-	case *grpc_inventory_manager_go.AgentIds:
+	case *grpc_inventory_manager_go.AgentsAlive:
 		wrapper = grpc_bus_go.InventoryEvents{
-			Event: &grpc_bus_go.InventoryEvents_AgentIds{x},
-		}
+			Event: &grpc_bus_go.InventoryEvents_AgentsAlive{x}}
 	case *grpc_inventory_go.EdgeControllerId:
 		wrapper = grpc_bus_go.InventoryEvents{
 			Event: &grpc_bus_go.InventoryEvents_EdgeControllerId{x}}
@@ -77,7 +76,7 @@ type InventoryEventsConsumer struct {
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
 type ConfigInventoryEventsConsumer struct {
 	// ChAgentsIds with the channel to receive agent ids
-	ChAgentIds chan *grpc_inventory_manager_go.AgentIds
+	ChAgentsAlive chan *grpc_inventory_manager_go.AgentsAlive
 	// ChEdgeControllerId with the channel to receive edge inventory ids
 	ChEdgeControllerId chan *grpc_inventory_go.EdgeControllerId
 	// ChEICStart with the channel to receive EIC start notifications.
@@ -88,8 +87,8 @@ type ConfigInventoryEventsConsumer struct {
 
 // Data struct indicating what data structures available in this topic will be accepted.
 type ConsumableStructsInventoryEventsConsumer struct {
-	// AgentIds consumption
-	AgentIds bool
+	// AgentsAlive consumption
+	AgentsAclive bool
 	// EdgeControllerId consumption
 	EdgeControllerId bool
 	// EICStartInfo consumption
@@ -99,12 +98,12 @@ type ConsumableStructsInventoryEventsConsumer struct {
 // NewConfigInventoryEventsConsumer creates the underlying channels with a given configuration.
 func NewConfigInventoryEventsConsumer(size int, toConsume ConsumableStructsInventoryEventsConsumer) ConfigInventoryEventsConsumer{
 
-	chAgentIds := make(chan *grpc_inventory_manager_go.AgentIds, size)
+	chAgentsAlive := make(chan *grpc_inventory_manager_go.AgentsAlive, size)
 	chEdgeControllerId := make(chan *grpc_inventory_go.EdgeControllerId, size)
 	chEICStart := make(chan *grpc_inventory_manager_go.EICStartInfo, size)
 
 	return ConfigInventoryEventsConsumer{
-		ChAgentIds: chAgentIds,
+		ChAgentsAlive: chAgentsAlive,
 		ChEdgeControllerId: chEdgeControllerId,
 		ChEICStart: chEICStart,
 		ToConsume: toConsume,
@@ -137,9 +136,9 @@ func (c InventoryEventsConsumer) Consume(ctx context.Context) derrors.Error{
 	}
 
 	switch x := target.Event.(type) {
-	case *grpc_bus_go.InventoryEvents_AgentIds:
-		if  c.Config.ToConsume.AgentIds {
-			c.Config.ChAgentIds <- x.AgentIds
+	case *grpc_bus_go.InventoryEvents_AgentsAlive:
+		if  c.Config.ToConsume.AgentsAclive {
+			c.Config.ChAgentsAlive <- x.AgentsAlive
 		}
 	case *grpc_bus_go.InventoryEvents_EdgeControllerId:
 		if c.Config.ToConsume.EdgeControllerId {
