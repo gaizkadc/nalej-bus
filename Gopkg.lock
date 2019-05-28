@@ -420,6 +420,7 @@
     "github.com/nalej/grpc-infrastructure-go",
     "github.com/nalej/grpc-inventory-go",
     "github.com/nalej/grpc-inventory-manager-go",
+    "github.com/nalej/grpc-network-go",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/rs/zerolog",

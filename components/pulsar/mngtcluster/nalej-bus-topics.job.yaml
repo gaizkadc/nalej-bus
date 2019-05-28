@@ -20,5 +20,5 @@ spec:
               bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/application --clusters local &&
               bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/infrastructure --clusters local &&
               bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/inventory --clusters local &&
-              bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/app-network --clusters local;
+              bin/pulsar-admin --admin-url http://broker.__NPH_NAMESPACE.svc:8080 namespaces create nalej/network --clusters local;
       restartPolicy: OnFailure
