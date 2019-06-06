@@ -48,6 +48,10 @@ func (m NetworkOpsProducer) Send(ctx context.Context, msg proto.Message) derrors
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_AuthorizeMemberRequest{x}}
     case *grpc_network_go.DisauthorizeMemberRequest:
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_DisauthorizeMemberRequest{x}}
+    case *grpc_network_go.AddDNSEntryRequest:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_AddDnsEntryRequest{x}}
+    case *grpc_network_go.DeleteDNSEntryRequest:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_DeleteDnsEntryRequest{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -77,6 +81,10 @@ type ConfigNetworkOpsConsumer struct {
     ChAuthorizeMembersRequest chan *grpc_network_go.AuthorizeMemberRequest
     // channel to receive disauthorize requests
     ChDisauthorizeMembersRequest chan *grpc_network_go.DisauthorizeMemberRequest
+    // channel to add DNS entries
+    ChAddDNSEntryRequest chan *grpc_network_go.AddDNSEntryRequest
+    // channel to delete DNS entries
+    ChDeleteDNSEntryRequest chan *grpc_network_go.DeleteDNSEntryRequest
     // object types to be considered for consumption
     ToConsume ConsumableStructsNetworkOpsConsumer
 }
@@ -84,9 +92,14 @@ type ConfigNetworkOpsConsumer struct {
 func NewConfigNetworksOpsConsumer(size int, toConsume ConsumableStructsNetworkOpsConsumer) ConfigNetworkOpsConsumer {
     chAuthorize := make(chan *grpc_network_go.AuthorizeMemberRequest,size)
     chDisauthorize := make(chan *grpc_network_go.DisauthorizeMemberRequest,size)
+    chAddDNSEntry := make(chan *grpc_network_go.AddDNSEntryRequest, size)
+    chDeleteDNSEntry := make(chan *grpc_network_go.DeleteDNSEntryRequest, size)
 
     return ConfigNetworkOpsConsumer{ChAuthorizeMembersRequest: chAuthorize,
-        ChDisauthorizeMembersRequest: chDisauthorize,ToConsume: toConsume}
+        ChDisauthorizeMembersRequest: chDisauthorize,
+        ChAddDNSEntryRequest: chAddDNSEntry,
+        ChDeleteDNSEntryRequest: chDeleteDNSEntry,
+        ToConsume: toConsume}
 }
 
 // Data struct indicating what data structures available in this topic will be accepted.
@@ -95,6 +108,10 @@ type ConsumableStructsNetworkOpsConsumer struct {
     AuthorizeMember bool
     // Consume disauthorize members
     DisauthorizeMember bool
+    // Consume add dns entries
+    AddDNSEntry bool
+    // Consume delete dns entries
+    DeleteDNSEntry bool
 }
 
 
@@ -130,6 +147,14 @@ func (c NetworkOpsConsumer) Consume(ctx context.Context) derrors.Error{
     case *grpc_bus_go.NetworkOps_DisauthorizeMemberRequest:
         if  c.Config.ToConsume.DisauthorizeMember {
             c.Config.ChDisauthorizeMembersRequest <- x.DisauthorizeMemberRequest
+        }
+    case *grpc_bus_go.NetworkOps_AddDnsEntryRequest:
+        if c.Config.ToConsume.AddDNSEntry {
+            c.Config.ChAddDNSEntryRequest <- x.AddDnsEntryRequest
+        }
+    case *grpc_bus_go.NetworkOps_DeleteDnsEntryRequest:
+        if c.Config.ToConsume.DeleteDNSEntry {
+            c.Config.ChDeleteDNSEntryRequest <- x.DeleteDnsEntryRequest
         }
     case nil:
         errMsg := "received nil entry"

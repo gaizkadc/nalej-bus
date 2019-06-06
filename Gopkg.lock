@@ -93,12 +93,12 @@
   version = "v0.0.50"
 
 [[projects]]
-  digest = "1:268c439f1929d452e7a5a6a8ba84f5010e0cca7063bfb46d167afc296b10fd0b"
+  digest = "1:5f9f97be8a4876a69d3a860a69daa5069446832a0fffa977226edb25ccb602bd"
   name = "github.com/nalej/grpc-bus-go"
   packages = ["."]
   pruneopts = ""
-  revision = "80fc3bce1fecc6fadb5e1b99217c203a36dc6865"
-  version = "v0.0.8"
+  revision = "d5a38f01121cd971637bd153d0b702c349d7653e"
+  version = "v0.0.9"
 
 [[projects]]
   digest = "1:44f7426538411ea9f774f96e3b102decc9f549b188e55e29ecc15be69542a96b"
@@ -331,7 +331,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:303bb7bcb96f7562686015a90eabd865f2c32c468e6702e1724d69b178d0427b"
+  digest = "1:52c6a188a1f16480607d7753e02cbd5ad43089d5550c725f32f46d376c946f37"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
@@ -340,7 +340,7 @@
     "protobuf/field_mask",
   ]
   pruneopts = ""
-  revision = "fb225487d10142b5bcc35abfc6cb9a0609614976"
+  revision = "eb0b1bdb6ae60fcfc41b8d907b50dfb346112301"
 
 [[projects]]
   digest = "1:6881653b963cd12dc1a9824aed5e122d0ff38e53e3ee07862f969a56ad2f2e9c"
