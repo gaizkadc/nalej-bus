@@ -52,6 +52,10 @@ func (m NetworkOpsProducer) Send(ctx context.Context, msg proto.Message) derrors
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_AddDnsEntryRequest{x}}
     case *grpc_network_go.DeleteDNSEntryRequest:
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_DeleteDnsEntryRequest{x}}
+    case *grpc_network_go.InboundServiceProxy:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_InboundAppServiceProxy{x}}
+    case *grpc_network_go.OutboundService:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_OutboundAppService{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -85,6 +89,10 @@ type ConfigNetworkOpsConsumer struct {
     ChAddDNSEntryRequest chan *grpc_network_go.AddDNSEntryRequest
     // channel to delete DNS entries
     ChDeleteDNSEntryRequest chan *grpc_network_go.DeleteDNSEntryRequest
+    // channel to receive InboundAppServiceProxy
+    ChInboundServiceProxy chan *grpc_network_go.InboundServiceProxy
+    // channel to receive OutboundAppService
+    ChOutboundService chan *grpc_network_go.OutboundService
     // object types to be considered for consumption
     ToConsume ConsumableStructsNetworkOpsConsumer
 }
@@ -94,11 +102,15 @@ func NewConfigNetworksOpsConsumer(size int, toConsume ConsumableStructsNetworkOp
     chDisauthorize := make(chan *grpc_network_go.DisauthorizeMemberRequest,size)
     chAddDNSEntry := make(chan *grpc_network_go.AddDNSEntryRequest, size)
     chDeleteDNSEntry := make(chan *grpc_network_go.DeleteDNSEntryRequest, size)
+    chInboundServiceProxy := make(chan *grpc_network_go.InboundServiceProxy, size)
+    chOutboundServiceProxy := make(chan *grpc_network_go.OutboundService, size)
 
     return ConfigNetworkOpsConsumer{ChAuthorizeMembersRequest: chAuthorize,
         ChDisauthorizeMembersRequest: chDisauthorize,
         ChAddDNSEntryRequest: chAddDNSEntry,
         ChDeleteDNSEntryRequest: chDeleteDNSEntry,
+        ChInboundServiceProxy: chInboundServiceProxy,
+        ChOutboundService: chOutboundServiceProxy,
         ToConsume: toConsume}
 }
 
@@ -112,6 +124,10 @@ type ConsumableStructsNetworkOpsConsumer struct {
     AddDNSEntry bool
     // Consume delete dns entries
     DeleteDNSEntry bool
+    // Consume inbound service proxy
+    InboundServiceProxy bool
+    // Consume outbound service
+    OutboundService bool
 }
 
 
@@ -155,6 +171,14 @@ func (c NetworkOpsConsumer) Consume(ctx context.Context) derrors.Error{
     case *grpc_bus_go.NetworkOps_DeleteDnsEntryRequest:
         if c.Config.ToConsume.DeleteDNSEntry {
             c.Config.ChDeleteDNSEntryRequest <- x.DeleteDnsEntryRequest
+        }
+    case *grpc_bus_go.NetworkOps_InboundAppServiceProxy:
+        if c.Config.ToConsume.InboundServiceProxy {
+            c.Config.ChInboundServiceProxy <- x.InboundAppServiceProxy
+        }
+    case *grpc_bus_go.NetworkOps_OutboundAppService:
+        if c.Config.ToConsume.OutboundService {
+            c.Config.ChOutboundService <- x.OutboundAppService
         }
     case nil:
         errMsg := "received nil entry"
