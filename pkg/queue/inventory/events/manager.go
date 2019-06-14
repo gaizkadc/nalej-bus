@@ -50,6 +50,9 @@ func (m InventoryEventsProducer) Send(ctx context.Context, msg proto.Message) de
 	case *grpc_inventory_manager_go.EICStartInfo:
 		wrapper = grpc_bus_go.InventoryEvents{
 			Event: &grpc_bus_go.InventoryEvents_EicStart{x}}
+	case *grpc_inventory_go.AssetUninstalledId:
+		wrapper = grpc_bus_go.InventoryEvents{
+			Event: &grpc_bus_go.InventoryEvents_AssetUninstalledId{x}}
 	default:
 		return derrors.NewInvalidArgumentError("invalid proto message type")
 	}
@@ -81,6 +84,8 @@ type ConfigInventoryEventsConsumer struct {
 	ChEdgeControllerId chan *grpc_inventory_go.EdgeControllerId
 	// ChEICStart with the channel to receive EIC start notifications.
 	ChEICStart chan *grpc_inventory_manager_go.EICStartInfo
+	// ChUninstalledAssetId with the channel to receive asset ids
+	ChUninstalledAssetId chan *grpc_inventory_go.AssetUninstalledId
 	// object types to be considered for consumption
 	ToConsume ConsumableStructsInventoryEventsConsumer
 }
@@ -93,6 +98,8 @@ type ConsumableStructsInventoryEventsConsumer struct {
 	EdgeControllerId bool
 	// EICStartInfo consumption
 	EICStartInfo bool
+	// UninstalledAssetId consumption
+	UninstalledAssetId bool
 }
 
 // NewConfigInventoryEventsConsumer creates the underlying channels with a given configuration.
@@ -101,11 +108,13 @@ func NewConfigInventoryEventsConsumer(size int, toConsume ConsumableStructsInven
 	chAgentsAlive := make(chan *grpc_inventory_manager_go.AgentsAlive, size)
 	chEdgeControllerId := make(chan *grpc_inventory_go.EdgeControllerId, size)
 	chEICStart := make(chan *grpc_inventory_manager_go.EICStartInfo, size)
+	ChUninstalledAssetId := make(chan *grpc_inventory_go.AssetUninstalledId, size)
 
 	return ConfigInventoryEventsConsumer{
 		ChAgentsAlive: chAgentsAlive,
 		ChEdgeControllerId: chEdgeControllerId,
 		ChEICStart: chEICStart,
+		ChUninstalledAssetId:ChUninstalledAssetId,
 		ToConsume: toConsume,
 	}
 }
@@ -148,6 +157,11 @@ func (c InventoryEventsConsumer) Consume(ctx context.Context) derrors.Error{
 		if c.Config.ToConsume.EICStartInfo {
 			c.Config.ChEICStart <- x.EicStart
 		}
+	case *grpc_bus_go.InventoryEvents_AssetUninstalledId:
+		if c.Config.ToConsume.UninstalledAssetId {
+			c.Config.ChUninstalledAssetId <- x.AssetUninstalledId
+		}
+
 	case nil:
 		errMsg := "received nil entry"
 		log.Error().Msg(errMsg)
