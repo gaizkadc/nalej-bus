@@ -43,6 +43,8 @@ func (m InventoryOpsProducer) Send(ctx context.Context, msg proto.Message) derro
 	switch x := msg.(type) {
 	case *grpc_inventory_manager_go.AgentOpResponse:
 		wrapper = grpc_bus_go.InventoryOps{ Operation: &grpc_bus_go.InventoryOps_AgentOpResponse{x}}
+	case * grpc_inventory_manager_go.EdgeControllerOpResponse:
+		wrapper = grpc_bus_go.InventoryOps{Operation: &grpc_bus_go.InventoryOps_EdgeControllerOpResponse{x}}
 	default:
 		return derrors.NewInvalidArgumentError("invalid proto message type")
 	}
@@ -78,15 +80,19 @@ func NewInventoryOpsConsumer (client bus.NalejClient, name string, exclusive boo
 
 // Data struct indicating what data structures available in this topic will be accepted.
 type ConsumableStructsInventoryOpsConsumer struct {
-	// Consume agent operation response
+	// AgentOpResponse to indicate that the consumer wants to receive AgentOpResponse messages.
 	AgentOpResponse bool
+	// EdgeControllerOpResponse to indicate that the consumer wants to receive EdgeControllerOpResponse messages.
+	EdgeControllerOpResponse bool
 }
 
 
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
 type ConfigInventoryOpsConsumer struct {
-	// channel to receive operation Responses
+	// ChAgentOpResponse channel to receive operation Responses
 	ChAgentOpResponse chan *grpc_inventory_manager_go.AgentOpResponse
+	// ChEdgeControllerOpResponse channel to receive operation Responses
+	ChEdgeControllerOpResponse chan *grpc_inventory_manager_go.EdgeControllerOpResponse
 	// object types to be considered for consumption
 	ToConsume ConsumableStructsInventoryOpsConsumer
 }
@@ -123,6 +129,10 @@ func (c InventoryOpsConsumer) Consume(ctx context.Context) derrors.Error{
 	case *grpc_bus_go.InventoryOps_AgentOpResponse:
 		if  c.Config.ToConsume.AgentOpResponse {
 			c.Config.ChAgentOpResponse <- x.AgentOpResponse
+		}
+	case *grpc_bus_go.InventoryOps_EdgeControllerOpResponse:
+		if c.Config.ToConsume.EdgeControllerOpResponse{
+			c.Config.ChEdgeControllerOpResponse <- x.EdgeControllerOpResponse
 		}
 	case nil:
 		errMsg := "received nil entry"
