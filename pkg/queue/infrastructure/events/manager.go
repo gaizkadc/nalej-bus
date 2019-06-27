@@ -46,6 +46,8 @@ func (m InfrastructureEventsProducer) Send(ctx context.Context, msg proto.Messag
     switch x := msg.(type) {
     case *grpc_infrastructure_go.UpdateClusterRequest:
         wrapper = grpc_bus_go.InfrastructureEvents{Event: &grpc_bus_go.InfrastructureEvents_UpdateClusterRequest{x}}
+    case *grpc_infrastructure_go.SetClusterStatusRequest:
+        wrapper = grpc_bus_go.InfrastructureEvents{Event: &grpc_bus_go.InfrastructureEvents_SetClusterStatusRequest{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -75,6 +77,8 @@ type InfrastructureEventsConsumer struct {
 type ConfigInfrastructureEventsConsumer struct {
     // channel to receive update cluster requests
     ChUpdateClusterRequest chan *grpc_infrastructure_go.UpdateClusterRequest
+    // channel to receive set cluster status requests
+    ChSetClusterStatusRequest chan *grpc_infrastructure_go.SetClusterStatusRequest
     // object types to be considered for consumption
     ToConsume ConsumableStructsInfrastructureEventsConsumer
 }
@@ -86,9 +90,11 @@ type ConfigInfrastructureEventsConsumer struct {
 //  instance of a configuration object
 func NewConfigInfrastructureEventsConsumer(size int, toConsume ConsumableStructsInfrastructureEventsConsumer) ConfigInfrastructureEventsConsumer {
     chUpdateClusterRequest := make(chan *grpc_infrastructure_go.UpdateClusterRequest, size)
+    chSetClusterStatusRequest := make(chan *grpc_infrastructure_go.SetClusterStatusRequest, size)
 
     return ConfigInfrastructureEventsConsumer{
         ChUpdateClusterRequest: chUpdateClusterRequest,
+        ChSetClusterStatusRequest: chSetClusterStatusRequest,
         ToConsume: toConsume,
     }
 }
@@ -97,6 +103,8 @@ func NewConfigInfrastructureEventsConsumer(size int, toConsume ConsumableStructs
 type ConsumableStructsInfrastructureEventsConsumer struct {
     // Consume update cluster requests
     UpdateClusterRequest bool
+    // Consume set cluster status requests
+    SetClusterStatusRequest bool
 }
 
 func NewInfrastructureEventsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigInfrastructureEventsConsumer) (*InfrastructureEventsConsumer, derrors.Error) {
@@ -127,6 +135,10 @@ func (c InfrastructureEventsConsumer) Consume(ctx context.Context) derrors.Error
     case *grpc_bus_go.InfrastructureEvents_UpdateClusterRequest:
         if c.Config.ToConsume.UpdateClusterRequest {
             c.Config.ChUpdateClusterRequest <- x.UpdateClusterRequest
+        }
+    case *grpc_bus_go.InfrastructureEvents_SetClusterStatusRequest:
+        if c.Config.ToConsume.SetClusterStatusRequest {
+            c.Config.ChSetClusterStatusRequest <- x.SetClusterStatusRequest
         }
     case nil:
         errMsg := "received nil entry"
