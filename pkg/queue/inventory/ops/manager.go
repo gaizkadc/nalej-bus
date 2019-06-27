@@ -104,9 +104,11 @@ type ConfigInventoryOpsConsumer struct {
 //  instance of a configuration object
 func NewConfigInventoryOpsConsumer(size int, toConsume ConsumableStructsInventoryOpsConsumer) ConfigInventoryOpsConsumer {
 	chOpResponse := make(chan *grpc_inventory_manager_go.AgentOpResponse, size)
+	chECOpResponse := make(chan *grpc_inventory_manager_go.EdgeControllerOpResponse, size)
 
 	return ConfigInventoryOpsConsumer{
 		ChAgentOpResponse: chOpResponse,
+		ChEdgeControllerOpResponse: chECOpResponse,
 		ToConsume: toConsume,
 	}
 }
