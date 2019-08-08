@@ -42,9 +42,9 @@ func NewPulsarProducer(client PulsarClient, name string, topic string) bus.Nalej
 
 func(p PulsarProducer) Send(ctx context.Context, msg []byte) derrors.Error {
     _, err := p.producer.Send(ctx, msg)
-    log.Error().Err(err).Msg("Producer send error")
 
     if err != nil {
+        log.Error().Err(err).Msg("Producer send error")
         return derrors.NewInternalError("impossible to send message", err)
     }
     return nil
