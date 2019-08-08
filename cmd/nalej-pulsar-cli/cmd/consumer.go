@@ -37,7 +37,7 @@ func init() {
 }
 
 func runConsumer () {
-    client := pulsar_comcast.NewClient(pulsarAddress)
+    client := pulsar_comcast.NewClient(pulsarAddress, nil)
 
     consumer,error := client.BuildConsumer(consumerName, topicConsumer, true)
     if error!=nil{

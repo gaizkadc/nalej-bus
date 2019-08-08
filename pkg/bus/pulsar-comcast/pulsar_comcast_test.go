@@ -50,7 +50,7 @@ var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
             }
 
             //create client
-            client = NewClient(PulsarAddress).(PulsarClient)
+            client = NewClient(PulsarAddress, nil).(PulsarClient)
             gomega.Expect(client).ShouldNot(gomega.BeNil())
         })
 
