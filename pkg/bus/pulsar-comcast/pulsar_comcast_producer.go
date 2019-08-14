@@ -9,6 +9,7 @@ import (
     "github.com/Comcast/pulsar-client-go"
     "github.com/nalej/derrors"
     "github.com/nalej/nalej-bus/pkg/bus"
+    "github.com/rs/zerolog/log"
     "time"
 )
 
@@ -43,6 +44,7 @@ func(p PulsarProducer) Send(ctx context.Context, msg []byte) derrors.Error {
     _, err := p.producer.Send(ctx, msg)
 
     if err != nil {
+        log.Error().Err(err).Msg("Producer send error")
         return derrors.NewInternalError("impossible to send message", err)
     }
     return nil

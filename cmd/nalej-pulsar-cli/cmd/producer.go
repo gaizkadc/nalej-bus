@@ -35,7 +35,7 @@ func init() {
 }
 
 func runProducer() {
-    client := pulsar_comcast.NewClient(pulsarAddress)
+    client := pulsar_comcast.NewClient(pulsarAddress, nil)
 
     producer, error := client.BuildProducer(producerName, producerTopic)
     if error != nil {

@@ -18,12 +18,15 @@ type PulsarClient struct {
     config pulsar.ManagedClientConfig
 }
 
-func NewClient(address string) bus.NalejClient {
+// NewClient creates a new NalejClient
+// asyncErr channel where errors will be sent, may be nil
+func NewClient(address string, asyncErr chan error) bus.NalejClient {
     pool := pulsar.NewManagedClientPool()
 
     config := pulsar.ManagedClientConfig{
-        ClientConfig: pulsar.ClientConfig{
-            Addr:        fmt.Sprintf("pulsar://%s", address),
+        ClientConfig:   pulsar.ClientConfig{
+            Addr:       fmt.Sprintf("pulsar://%s", address),
+            Errs:       asyncErr,
         },
     }
 

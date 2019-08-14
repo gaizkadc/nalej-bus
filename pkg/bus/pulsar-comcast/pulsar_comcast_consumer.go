@@ -9,6 +9,7 @@ import (
     "github.com/Comcast/pulsar-client-go"
     "github.com/nalej/derrors"
     "github.com/nalej/nalej-bus/pkg/bus"
+    "github.com/rs/zerolog/log"
     "time"
 )
 
@@ -39,6 +40,7 @@ func NewPulsarConsumer(client PulsarClient, name string, topic string, exclusive
 func (c PulsarConsumer) Receive(ctx context.Context) ([]byte, derrors.Error) {
     msg, err := c.consumer.Receive(ctx)
     if err != nil {
+        log.Error().Err(err).Msg("Consumer receive error")
         return nil, derrors.NewInternalError("failed receiving message", err)
     }
 
