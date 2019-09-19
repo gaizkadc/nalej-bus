@@ -57,6 +57,10 @@ func (m NetworkOpsProducer) Send(ctx context.Context, msg proto.Message) derrors
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_InboundAppServiceProxy{x}}
     case *grpc_network_go.OutboundService:
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_OutboundAppService{x}}
+    case *grpc_application_network_go.AddConnectionRequest:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_AddConnectionRequest{x}}
+    case *grpc_application_network_go.RemoveConnectionRequest:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_RemoveConnectionRequest{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
