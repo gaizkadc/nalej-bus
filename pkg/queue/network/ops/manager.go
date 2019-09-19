@@ -9,6 +9,7 @@ import (
     "fmt"
     "github.com/golang/protobuf/proto"
     "github.com/nalej/derrors"
+    "github.com/nalej/grpc-application-network-go"
     "github.com/nalej/grpc-bus-go"
     "github.com/nalej/grpc-network-go"
     "github.com/nalej/nalej-bus/pkg/bus"
@@ -93,6 +94,10 @@ type ConfigNetworkOpsConsumer struct {
     ChInboundServiceProxy chan *grpc_network_go.InboundServiceProxy
     // channel to receive OutboundAppService
     ChOutboundService chan *grpc_network_go.OutboundService
+    // channel to receive AddConnectionRequest
+    ChAddConnectionRequest chan *grpc_application_network_go.AddConnectionRequest
+    // channel to receive RemoveConnectionRequest
+    ChRemoveConnectionRequest chan *grpc_application_network_go.RemoveConnectionRequest
     // object types to be considered for consumption
     ToConsume ConsumableStructsNetworkOpsConsumer
 }
@@ -104,6 +109,8 @@ func NewConfigNetworksOpsConsumer(size int, toConsume ConsumableStructsNetworkOp
     chDeleteDNSEntry := make(chan *grpc_network_go.DeleteDNSEntryRequest, size)
     chInboundServiceProxy := make(chan *grpc_network_go.InboundServiceProxy, size)
     chOutboundServiceProxy := make(chan *grpc_network_go.OutboundService, size)
+    chAddConnection := make (chan * grpc_application_network_go.AddConnectionRequest, size)
+    chRemoveConnection := make (chan * grpc_application_network_go.RemoveConnectionRequest, size)
 
     return ConfigNetworkOpsConsumer{ChAuthorizeMembersRequest: chAuthorize,
         ChDisauthorizeMembersRequest: chDisauthorize,
@@ -111,6 +118,8 @@ func NewConfigNetworksOpsConsumer(size int, toConsume ConsumableStructsNetworkOp
         ChDeleteDNSEntryRequest: chDeleteDNSEntry,
         ChInboundServiceProxy: chInboundServiceProxy,
         ChOutboundService: chOutboundServiceProxy,
+        ChAddConnectionRequest: chAddConnection,
+        ChRemoveConnectionRequest: chRemoveConnection,
         ToConsume: toConsume}
 }
 
@@ -128,6 +137,10 @@ type ConsumableStructsNetworkOpsConsumer struct {
     InboundServiceProxy bool
     // Consume outbound service
     OutboundService bool
+    // Consume add connection
+    AddConnection bool
+    // Consume remove connection
+    RemoveConnection bool
 }
 
 
@@ -179,6 +192,14 @@ func (c NetworkOpsConsumer) Consume(ctx context.Context) derrors.Error{
     case *grpc_bus_go.NetworkOps_OutboundAppService:
         if c.Config.ToConsume.OutboundService {
             c.Config.ChOutboundService <- x.OutboundAppService
+        }
+    case *grpc_bus_go.NetworkOps_AddConnectionRequest:
+        if c.Config.ToConsume.AddConnection {
+            c.Config.ChAddConnectionRequest <- x.AddConnectionRequest
+        }
+    case *grpc_bus_go.NetworkOps_RemoveConnectionRequest:
+        if c.Config.ToConsume.RemoveConnection {
+            c.Config.ChRemoveConnectionRequest <- x.RemoveConnectionRequest
         }
     case nil:
         errMsg := "received nil entry"
