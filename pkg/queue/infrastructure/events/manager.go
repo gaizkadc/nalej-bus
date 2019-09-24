@@ -50,7 +50,7 @@ func (m InfrastructureEventsProducer) Send(ctx context.Context, msg proto.Messag
     case *grpc_infrastructure_go.SetClusterStatusRequest:
         wrapper = grpc_bus_go.InfrastructureEvents{Event: &grpc_bus_go.InfrastructureEvents_SetClusterStatusRequest{x}}
     case *grpc_connectivity_manager_go.ClusterAlive:
-        wrapper = grpc_bus_go.InfrastructureEvents{Event: &grpc_bus_go.InfrastructureEvents_ClusterAliveRequest{x}}
+        wrapper = grpc_bus_go.InfrastructureEvents{Event: &grpc_bus_go.InfrastructureEvents_ClusterAlive{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -83,7 +83,7 @@ type ConfigInfrastructureEventsConsumer struct {
     // channel to receive set cluster status requests
     ChSetClusterStatusRequest chan *grpc_infrastructure_go.SetClusterStatusRequest
     // channel to receive cluster alive requests
-    ChClusterAliveRequest chan *grpc_connectivity_manager_go.ClusterAlive
+    ChClusterAlive chan *grpc_connectivity_manager_go.ClusterAlive
     // object types to be considered for consumption
     ToConsume ConsumableStructsInfrastructureEventsConsumer
 }
@@ -96,12 +96,12 @@ type ConfigInfrastructureEventsConsumer struct {
 func NewConfigInfrastructureEventsConsumer(size int, toConsume ConsumableStructsInfrastructureEventsConsumer) ConfigInfrastructureEventsConsumer {
     chUpdateClusterRequest := make(chan *grpc_infrastructure_go.UpdateClusterRequest, size)
     chSetClusterStatusRequest := make(chan *grpc_infrastructure_go.SetClusterStatusRequest, size)
-    chClusterAliveRequest := make(chan *grpc_connectivity_manager_go.ClusterAlive, size)
+    chClusterAlive := make(chan *grpc_connectivity_manager_go.ClusterAlive, size)
 
     return ConfigInfrastructureEventsConsumer{
         ChUpdateClusterRequest: chUpdateClusterRequest,
         ChSetClusterStatusRequest: chSetClusterStatusRequest,
-        ChClusterAliveRequest: chClusterAliveRequest,
+        ChClusterAlive: chClusterAlive,
         ToConsume: toConsume,
     }
 }
@@ -149,9 +149,9 @@ func (c InfrastructureEventsConsumer) Consume(ctx context.Context) derrors.Error
         if c.Config.ToConsume.SetClusterStatusRequest {
             c.Config.ChSetClusterStatusRequest <- x.SetClusterStatusRequest
         }
-    case *grpc_bus_go.InfrastructureEvents_ClusterAliveRequest:
+    case *grpc_bus_go.InfrastructureEvents_ClusterAlive:
         if c.Config.ToConsume.ClusterAliveRequest {
-            c.Config.ChClusterAliveRequest <- x.ClusterAliveRequest
+            c.Config.ChClusterAlive <- x.ClusterAlive
         }
     case nil:
         errMsg := "received nil entry"

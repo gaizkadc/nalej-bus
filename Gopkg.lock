@@ -109,12 +109,12 @@
   version = "v0.0.53"
 
 [[projects]]
-  digest = "1:facb170456d0b90a61180d1eed9aff1184bf3ca15a3408b9f25732bb0ab342b5"
+  digest = "1:d5dd24fef8eaff65ad6d8d248e13234c9a902a5301689ded84da51366a468d6d"
   name = "github.com/nalej/grpc-bus-go"
   packages = ["."]
   pruneopts = ""
-  revision = "5ef33614f9cdfd839296ac455d7028a6cfc7fe29"
-  version = "v0.0.18"
+  revision = "e96fa705be218641e9b4ba695ed7ef200592a533"
+  version = "v0.0.19"
 
 [[projects]]
   digest = "1:1ed874bfd5103d0fe53e49e1f4464d377cf5cac051ae7e43b3c3e69888f499ef"
