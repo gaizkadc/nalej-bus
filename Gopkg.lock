@@ -109,12 +109,12 @@
   version = "v0.0.53"
 
 [[projects]]
-  digest = "1:a3f288d69631c5bec04bb232d746105fbe80074e868c7f2ecf30a5891350ad88"
+  digest = "1:facb170456d0b90a61180d1eed9aff1184bf3ca15a3408b9f25732bb0ab342b5"
   name = "github.com/nalej/grpc-bus-go"
   packages = ["."]
   pruneopts = ""
-  revision = "380ebd75aef76ed868fdc99528564a617cd3fe10"
-  version = "v0.0.17"
+  revision = "5ef33614f9cdfd839296ac455d7028a6cfc7fe29"
+  version = "v0.0.18"
 
 [[projects]]
   digest = "1:1ed874bfd5103d0fe53e49e1f4464d377cf5cac051ae7e43b3c3e69888f499ef"
@@ -139,6 +139,14 @@
   pruneopts = ""
   revision = "7895e36f8e79a9219e48f5a1c72296d1f3928231"
   version = "v0.0.92"
+
+[[projects]]
+  digest = "1:a00c84dcff7308478c3b7273833785c522f355180b420db27d678ff9ea1d4ee5"
+  name = "github.com/nalej/grpc-connectivity-manager-go"
+  packages = ["."]
+  pruneopts = ""
+  revision = "545e6763cb4e8933cde0b768a43085a1fdfce51f"
+  version = "v0.0.1"
 
 [[projects]]
   digest = "1:0bad099051ea5df46222752d38f98673d2ccec88ab40e30a9ec3d1473cbcd634"
@@ -451,6 +459,7 @@
     "github.com/nalej/grpc-application-network-go",
     "github.com/nalej/grpc-bus-go",
     "github.com/nalej/grpc-conductor-go",
+    "github.com/nalej/grpc-connectivity-manager-go",
     "github.com/nalej/grpc-infrastructure-go",
     "github.com/nalej/grpc-inventory-go",
     "github.com/nalej/grpc-inventory-manager-go",
