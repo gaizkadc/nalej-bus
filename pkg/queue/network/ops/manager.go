@@ -61,6 +61,10 @@ func (m NetworkOpsProducer) Send(ctx context.Context, msg proto.Message) derrors
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_AddConnectionRequest{x}}
     case *grpc_application_network_go.RemoveConnectionRequest:
         wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_RemoveConnectionRequest{x}}
+    case *grpc_network_go.AuthorizeZTConnectionRequest:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_AuthorizeZtConnection{x}}
+    case *grpc_network_go.RegisterZTConnectionRequest:
+        wrapper = grpc_bus_go.NetworkOps{Operation: &grpc_bus_go.NetworkOps_RegisterZtConnection{x}}
     default:
         return derrors.NewInvalidArgumentError("invalid proto message type")
     }
@@ -102,6 +106,10 @@ type ConfigNetworkOpsConsumer struct {
     ChAddConnectionRequest chan *grpc_application_network_go.AddConnectionRequest
     // channel to receive RemoveConnectionRequest
     ChRemoveConnectionRequest chan *grpc_application_network_go.RemoveConnectionRequest
+    // channel to receive AuthorizeZTConnectionRequest
+    ChAuthorizeZTConnection chan *grpc_network_go.AuthorizeZTConnectionRequest
+    // channel to receive RegisterZTConnectionRequest
+    ChRegisterZTConnection chan *grpc_network_go.RegisterZTConnectionRequest
     // object types to be considered for consumption
     ToConsume ConsumableStructsNetworkOpsConsumer
 }
@@ -115,15 +123,21 @@ func NewConfigNetworksOpsConsumer(size int, toConsume ConsumableStructsNetworkOp
     chOutboundServiceProxy := make(chan *grpc_network_go.OutboundService, size)
     chAddConnection := make (chan * grpc_application_network_go.AddConnectionRequest, size)
     chRemoveConnection := make (chan * grpc_application_network_go.RemoveConnectionRequest, size)
+    chAuthorizeZTConnection := make(chan * grpc_network_go.AuthorizeZTConnectionRequest, size)
+    chRegisterZTConnection := make (chan * grpc_network_go.RegisterZTConnectionRequest, size)
+
+
 
     return ConfigNetworkOpsConsumer{ChAuthorizeMembersRequest: chAuthorize,
         ChDisauthorizeMembersRequest: chDisauthorize,
-        ChAddDNSEntryRequest: chAddDNSEntry,
-        ChDeleteDNSEntryRequest: chDeleteDNSEntry,
-        ChInboundServiceProxy: chInboundServiceProxy,
-        ChOutboundService: chOutboundServiceProxy,
-        ChAddConnectionRequest: chAddConnection,
-        ChRemoveConnectionRequest: chRemoveConnection,
+        ChAddDNSEntryRequest:       chAddDNSEntry,
+        ChDeleteDNSEntryRequest:    chDeleteDNSEntry,
+        ChInboundServiceProxy:      chInboundServiceProxy,
+        ChOutboundService:          chOutboundServiceProxy,
+        ChAddConnectionRequest:     chAddConnection,
+        ChRemoveConnectionRequest:  chRemoveConnection,
+        ChAuthorizeZTConnection:    chAuthorizeZTConnection,
+        ChRegisterZTConnection:     chRegisterZTConnection,
         ToConsume: toConsume}
 }
 
@@ -145,6 +159,10 @@ type ConsumableStructsNetworkOpsConsumer struct {
     AddConnection bool
     // Consume remove connection
     RemoveConnection bool
+    // Consume authorize zt connection
+    AuthorizeZTConnection bool
+    // Consume register zt connection
+    RegisterZTConnecion bool
 }
 
 
@@ -204,6 +222,14 @@ func (c NetworkOpsConsumer) Consume(ctx context.Context) derrors.Error{
     case *grpc_bus_go.NetworkOps_RemoveConnectionRequest:
         if c.Config.ToConsume.RemoveConnection {
             c.Config.ChRemoveConnectionRequest <- x.RemoveConnectionRequest
+        }
+    case *grpc_bus_go.NetworkOps_AuthorizeZtConnection:
+        if c.Config.ToConsume.AuthorizeZTConnection {
+            c.Config.ChAuthorizeZTConnection <- x.AuthorizeZtConnection
+        }
+    case *grpc_bus_go.NetworkOps_RegisterZtConnection:
+        if c.Config.ToConsume.RegisterZTConnecion {
+            c.Config.ChRegisterZTConnection <- x.RegisterZtConnection
         }
     case nil:
         errMsg := "received nil entry"
