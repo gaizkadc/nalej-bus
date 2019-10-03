@@ -141,12 +141,12 @@
   version = "v0.0.92"
 
 [[projects]]
-  digest = "1:a00c84dcff7308478c3b7273833785c522f355180b420db27d678ff9ea1d4ee5"
+  digest = "1:94f368a2db0cd367bbde71ad88dcab84d5b8d78518ef3a0c235976594d304d3f"
   name = "github.com/nalej/grpc-connectivity-manager-go"
   packages = ["."]
   pruneopts = ""
-  revision = "545e6763cb4e8933cde0b768a43085a1fdfce51f"
-  version = "v0.0.1"
+  revision = "3d110b2be9a969d36cf8b26aee397b92f90d2dc4"
+  version = "v0.0.2"
 
 [[projects]]
   digest = "1:0bad099051ea5df46222752d38f98673d2ccec88ab40e30a9ec3d1473cbcd634"
