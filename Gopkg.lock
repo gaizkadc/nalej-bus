@@ -91,12 +91,12 @@
   version = "v0.0.86"
 
 [[projects]]
-  digest = "1:02083d8ca05dd001d59b90373a70d4e64ed114bf841550f4c28190bfec36ef02"
+  digest = "1:ff16cf715f64d0a449e577079d885382b435a97d0afb25b8613a3e0bec6f2e9e"
   name = "github.com/nalej/grpc-application-network-go"
   packages = ["."]
   pruneopts = ""
-  revision = "d019548b5a42df9583e40d1e36940369b36e8aa5"
-  version = "v0.0.10"
+  revision = "4e2f8c63efcdfd5519cdbcd797a4d62976d94054"
+  version = "v0.0.13"
 
 [[projects]]
   digest = "1:be9824efa8944bc7180a51b2e0c1b62d49902a3e5faa3a1ed57a15358e465096"
@@ -454,7 +454,6 @@
     "github.com/Comcast/pulsar-client-go",
     "github.com/golang/protobuf/proto",
     "github.com/nalej/derrors",
-    "github.com/nalej/grpc-application-go",
     "github.com/nalej/grpc-application-network-go",
     "github.com/nalej/grpc-bus-go",
     "github.com/nalej/grpc-conductor-go",
