@@ -1,8 +1,12 @@
 {
   "language": "golang",
+  "version": "v0.4.0",
   "application_list": [
     "pulsar",
     "nalej-pulsar-cli"
+  ],
+  "image_list": [
+    ""
   ],
   "tools": [
     "azure",
