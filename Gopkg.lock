@@ -91,12 +91,12 @@
   version = "v0.0.86"
 
 [[projects]]
-  digest = "1:0765e44d0ba70b061cc719211ac84a6223505c96e467f8a7eec7aeb15151513c"
+  digest = "1:963a0072b4647bb23128ed053af6b2fbc18fc177a906fb56c973e2bbb4f85015"
   name = "github.com/nalej/grpc-application-network-go"
   packages = ["."]
   pruneopts = ""
-  revision = "fd2352e1a5a987f345ffcb8c2d10f07ffb0d1a1a"
-  version = "v0.0.14"
+  revision = "694ff2695af471c0c0f97dcdfbea137dc8c26f75"
+  version = "v0.0.11"
 
 [[projects]]
   digest = "1:be9824efa8944bc7180a51b2e0c1b62d49902a3e5faa3a1ed57a15358e465096"
@@ -131,20 +131,20 @@
   version = "v0.0.34"
 
 [[projects]]
-  digest = "1:b20974f33d5927364de58b99328ee8bdbb23fa0911a92e3a868afec5d92d5466"
+  digest = "1:7a8ba8c56b116a037799514848afacd52474d6c0d33dbc72d3ba7c1de4e7bd33"
   name = "github.com/nalej/grpc-conductor-go"
   packages = ["."]
   pruneopts = ""
-  revision = "7895e36f8e79a9219e48f5a1c72296d1f3928231"
-  version = "v0.0.92"
+  revision = "3cb276e34c5c31e5aeeb9a1279b4682ff9b161ae"
+  version = "v0.0.93"
 
 [[projects]]
-  digest = "1:94f368a2db0cd367bbde71ad88dcab84d5b8d78518ef3a0c235976594d304d3f"
+  digest = "1:3efed612f5abd564fb8a67232e6512c94595879e9eae78fb5d99e499d0595a9d"
   name = "github.com/nalej/grpc-connectivity-manager-go"
   packages = ["."]
   pruneopts = ""
-  revision = "3d110b2be9a969d36cf8b26aee397b92f90d2dc4"
-  version = "v0.0.2"
+  revision = "6356ce4ee26d171c3b2ac47203a2e36f35875406"
+  version = "v0.0.3"
 
 [[projects]]
   digest = "1:0bad099051ea5df46222752d38f98673d2ccec88ab40e30a9ec3d1473cbcd634"
