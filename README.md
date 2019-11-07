@@ -203,10 +203,19 @@ client.Close()
 * If using shared subscriptions, the name of the subscription must be the same. 
 See https://pulsar.apache.org/docs/en/concepts-messaging/#subscription-modes for more details
 
+
 ## Contributing
-
+​
 Please read [contributing.md](contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
+​
+​
+## Versioning
+​
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+​
+## Authors
+​
+See also the list of [contributors](https://github.com/nalej/grpc-utils/contributors) who participated in this project.
+​
 ## License
-
-This project is licensed under Apache 2.0 - see the [license](LICENSE-2.0.txt) file for details.
+This project is licensed under the Apache 2.0 License - see the [LICENSE-2.0.txt](LICENSE-2.0.txt) file for details.

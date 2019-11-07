@@ -17,109 +17,107 @@
 package pulsar_comcast
 
 import (
-    "context"
-    "github.com/nalej/derrors"
-    "github.com/nalej/nalej-bus/pkg/bus"
-    "github.com/nalej/nalej-bus/pkg/utils"
-    "github.com/onsi/ginkgo"
-    "github.com/onsi/gomega"
-    "os"
-    "time"
+	"context"
+	"github.com/nalej/derrors"
+	"github.com/nalej/nalej-bus/pkg/bus"
+	"github.com/nalej/nalej-bus/pkg/utils"
+	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
+	"os"
+	"time"
 )
 
-const(
-    SendTimeout = 2
+const (
+	SendTimeout = 2
 )
 
 var _ = ginkgo.Describe("Test execution of Pulsar wrappers in Nalej", func() {
 
-    var isReady bool
-    var PulsarAddress string
-    var client PulsarClient
-    var err derrors.Error
+	var isReady bool
+	var PulsarAddress string
+	var client PulsarClient
+	var err derrors.Error
 
-    ginkgo.BeforeSuite(func() {
-        isReady = false
-        if utils.RunIntegrationTests() {
-            PulsarAddress = os.Getenv(utils.IT_PULSAR_ADDRESS)
-            if PulsarAddress != "" {
-                isReady = true
-            }
-        }
+	ginkgo.BeforeSuite(func() {
+		isReady = false
+		if utils.RunIntegrationTests() {
+			PulsarAddress = os.Getenv(utils.IT_PULSAR_ADDRESS)
+			if PulsarAddress != "" {
+				isReady = true
+			}
+		}
 
-        if !isReady {
-            return
-        }
-    })
+		if !isReady {
+			return
+		}
+	})
 
-    ginkgo.Context("Evaluate consumers", func(){
+	ginkgo.Context("Evaluate consumers", func() {
 
+		ginkgo.BeforeEach(func() {
+			if !isReady {
+				ginkgo.Skip("no integration test set")
+				return
+			}
 
-        ginkgo.BeforeEach(func(){
-            if !isReady {
-                ginkgo.Skip("no integration test set")
-                return
-            }
+			//create client
+			client = NewClient(PulsarAddress, nil).(PulsarClient)
+			gomega.Expect(client).ShouldNot(gomega.BeNil())
+		})
 
-            //create client
-            client = NewClient(PulsarAddress, nil).(PulsarClient)
-            gomega.Expect(client).ShouldNot(gomega.BeNil())
-        })
+		ginkgo.It("produce and consume with the same client", func() {
 
+			if !isReady {
+				ginkgo.Skip("no integration test set")
+				return
+			}
 
-        ginkgo.It("produce and consume with the same client", func(){
+			// create producer
+			prod := NewPulsarProducer(client, "prod1", "public/default/topic")
+			gomega.Expect(prod).ShouldNot(gomega.BeNil())
 
-            if !isReady {
-                ginkgo.Skip("no integration test set")
-                return
-            }
+			// create consumer
+			cons := NewPulsarConsumer(client, "cons1", "public/default/topic", true)
+			gomega.Expect(prod).ShouldNot(gomega.BeNil())
 
-            // create producer
-            prod := NewPulsarProducer(client, "prod1", "public/default/topic")
-            gomega.Expect(prod).ShouldNot(gomega.BeNil())
+			msg := "test message"
 
-            // create consumer
-            cons := NewPulsarConsumer(client, "cons1", "public/default/topic", true)
-            gomega.Expect(prod).ShouldNot(gomega.BeNil())
+			received_ch := make(chan []byte, 1)
 
-            msg := "test message"
+			go receive(cons, received_ch)
 
-            received_ch := make(chan []byte,1)
+			// produce something
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*SendTimeout)
+			err = prod.Send(ctx, []byte(msg))
+			cancel()
+			gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error sending message")
 
-            go receive(cons, received_ch)
+			// In one second this should arrive
+			time.Sleep(time.Second)
+			// this channel should return something interesting
+			received := <-received_ch
+			gomega.Expect(string(received)).Should(gomega.Equal(msg))
 
-            // produce something
-            ctx,cancel := context.WithTimeout(context.Background(), time.Second * SendTimeout)
-            err = prod.Send(ctx, []byte(msg))
-            cancel()
-            gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error sending message")
+			ctx, cancel = context.WithTimeout(context.Background(), time.Second*SendTimeout)
+			err = prod.Close(ctx)
+			cancel()
+			gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error closing producer")
 
-            // In one second this should arrive
-            time.Sleep(time.Second)
-            // this channel should return something interesting
-            received := <-received_ch
-            gomega.Expect(string(received)).Should(gomega.Equal(msg))
+			ctx, cancel = context.WithTimeout(context.Background(), time.Second*SendTimeout)
+			err = cons.Close(ctx)
+			cancel()
+			gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error closing consumer")
 
-            ctx,cancel = context.WithTimeout(context.Background(), time.Second * SendTimeout)
-            err = prod.Close(ctx)
-            cancel()
-            gomega.Expect(err).ShouldNot(gomega.HaveOccurred(),"error closing producer")
-
-            ctx,cancel = context.WithTimeout(context.Background(), time.Second * SendTimeout)
-            err = cons.Close(ctx)
-            cancel()
-            gomega.Expect(err).ShouldNot(gomega.HaveOccurred(),"error closing consumer")
-
-        })
-    })
+		})
+	})
 })
 
 // Helping function using a channel to return results
-func receive(cons bus.NalejConsumer, ch chan <- []byte)  {
-    ctx,cancel := context.WithTimeout(context.Background(), time.Second * SendTimeout)
-    received, err := cons.Receive(ctx)
-    cancel()
-    gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error receiving message")
+func receive(cons bus.NalejConsumer, ch chan<- []byte) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*SendTimeout)
+	received, err := cons.Receive(ctx)
+	cancel()
+	gomega.Expect(err).ShouldNot(gomega.HaveOccurred(), "error receiving message")
 
-    ch <- received
+	ch <- received
 }

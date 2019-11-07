@@ -17,6 +17,6 @@
 package utils
 
 const (
-    // Pulsar address for testing
-    IT_PULSAR_ADDRESS="IT_PULSAR_ADDRESS"
+	// Pulsar address for testing
+	IT_PULSAR_ADDRESS = "IT_PULSAR_ADDRESS"
 )

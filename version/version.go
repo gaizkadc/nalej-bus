@@ -26,6 +26,5 @@ var AppVersion string
 var Commit string
 
 func GetVersionInfo() string {
-    return fmt.Sprintf("version: %s commit: %s\n", AppVersion, Commit)
+	return fmt.Sprintf("version: %s commit: %s\n", AppVersion, Commit)
 }
-
