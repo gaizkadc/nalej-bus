@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 Nalej
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ops
 
 import (
@@ -13,7 +29,7 @@ import (
 )
 
 const (
-	InventoryOpsTopic="nalej/inventory/ops"
+	InventoryOpsTopic = "nalej/inventory/ops"
 )
 
 // Producer
@@ -27,7 +43,7 @@ type InventoryOpsProducer struct {
 //  name of the producer
 // return:
 //  built producer
-func NewInventoryOpsProducer (client bus.NalejClient, name string) (*InventoryOpsProducer, derrors.Error) {
+func NewInventoryOpsProducer(client bus.NalejClient, name string) (*InventoryOpsProducer, derrors.Error) {
 	prod, err := client.BuildProducer(name, InventoryOpsTopic)
 	if err != nil {
 		return nil, err
@@ -38,12 +54,12 @@ func NewInventoryOpsProducer (client bus.NalejClient, name string) (*InventoryOp
 // Generic function that decides what to send depending on the object type.
 func (m InventoryOpsProducer) Send(ctx context.Context, msg proto.Message) derrors.Error {
 
-	var  wrapper grpc_bus_go.InventoryOps
+	var wrapper grpc_bus_go.InventoryOps
 
 	switch x := msg.(type) {
 	case *grpc_inventory_manager_go.AgentOpResponse:
-		wrapper = grpc_bus_go.InventoryOps{ Operation: &grpc_bus_go.InventoryOps_AgentOpResponse{x}}
-	case * grpc_inventory_manager_go.EdgeControllerOpResponse:
+		wrapper = grpc_bus_go.InventoryOps{Operation: &grpc_bus_go.InventoryOps_AgentOpResponse{x}}
+	case *grpc_inventory_manager_go.EdgeControllerOpResponse:
 		wrapper = grpc_bus_go.InventoryOps{Operation: &grpc_bus_go.InventoryOps_EdgeControllerOpResponse{x}}
 	default:
 		return derrors.NewInvalidArgumentError("invalid proto message type")
@@ -66,16 +82,16 @@ func (m InventoryOpsProducer) Send(ctx context.Context, msg proto.Message) derro
 
 type InventoryOpsConsumer struct {
 	Consumer bus.NalejConsumer
-	Config ConfigInventoryOpsConsumer
+	Config   ConfigInventoryOpsConsumer
 }
 
-func NewInventoryOpsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigInventoryOpsConsumer) (*InventoryOpsConsumer, derrors.Error) {
+func NewInventoryOpsConsumer(client bus.NalejClient, name string, exclusive bool, config ConfigInventoryOpsConsumer) (*InventoryOpsConsumer, derrors.Error) {
 	consumer, err := client.BuildConsumer(name, InventoryOpsTopic, exclusive)
 	if err != nil {
 		return nil, err
 	}
 
-	return &InventoryOpsConsumer{Consumer: consumer,Config: config}, nil
+	return &InventoryOpsConsumer{Consumer: consumer, Config: config}, nil
 }
 
 // Data struct indicating what data structures available in this topic will be accepted.
@@ -85,7 +101,6 @@ type ConsumableStructsInventoryOpsConsumer struct {
 	// EdgeControllerOpResponse to indicate that the consumer wants to receive EdgeControllerOpResponse messages.
 	EdgeControllerOpResponse bool
 }
-
 
 // Struct designed to config a consumer defining what actions to perform depending on the incoming object.
 type ConfigInventoryOpsConsumer struct {
@@ -107,14 +122,14 @@ func NewConfigInventoryOpsConsumer(size int, toConsume ConsumableStructsInventor
 	chECOpResponse := make(chan *grpc_inventory_manager_go.EdgeControllerOpResponse, size)
 
 	return ConfigInventoryOpsConsumer{
-		ChAgentOpResponse: chOpResponse,
+		ChAgentOpResponse:          chOpResponse,
 		ChEdgeControllerOpResponse: chECOpResponse,
-		ToConsume: toConsume,
+		ToConsume:                  toConsume,
 	}
 }
 
 // Consume any of the possible objects that can be sent to this queue and send it to the corresponding channel.
-func (c InventoryOpsConsumer) Consume(ctx context.Context) derrors.Error{
+func (c InventoryOpsConsumer) Consume(ctx context.Context) derrors.Error {
 	msg, err := c.Consumer.Receive(ctx)
 	if err != nil {
 		return err
@@ -129,11 +144,11 @@ func (c InventoryOpsConsumer) Consume(ctx context.Context) derrors.Error{
 
 	switch x := target.Operation.(type) {
 	case *grpc_bus_go.InventoryOps_AgentOpResponse:
-		if  c.Config.ToConsume.AgentOpResponse {
+		if c.Config.ToConsume.AgentOpResponse {
 			c.Config.ChAgentOpResponse <- x.AgentOpResponse
 		}
 	case *grpc_bus_go.InventoryOps_EdgeControllerOpResponse:
-		if c.Config.ToConsume.EdgeControllerOpResponse{
+		if c.Config.ToConsume.EdgeControllerOpResponse {
 			c.Config.ChEdgeControllerOpResponse <- x.EdgeControllerOpResponse
 		}
 	case nil:
@@ -141,8 +156,8 @@ func (c InventoryOpsConsumer) Consume(ctx context.Context) derrors.Error{
 		log.Error().Msg(errMsg)
 		return derrors.NewInvalidArgumentError(errMsg)
 	default:
-		errMsg := fmt.Sprintf("unknown object type in %s",InventoryOpsTopic)
-		log.Error().Interface("type",x).Msg(errMsg)
+		errMsg := fmt.Sprintf("unknown object type in %s", InventoryOpsTopic)
+		log.Error().Interface("type", x).Msg(errMsg)
 		return derrors.NewInvalidArgumentError(errMsg)
 	}
 	return nil

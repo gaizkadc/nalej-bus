@@ -1,5 +1,17 @@
 /*
- * Copyright (C) 2019 Nalej - All Rights Reserved
+ * Copyright 2019 Nalej
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package events
@@ -17,7 +29,7 @@ import (
 )
 
 const (
-	ApplicationEventsTopic="nalej/application/events"
+	ApplicationEventsTopic = "nalej/application/events"
 )
 
 type ApplicationEventsProducer struct {
@@ -30,7 +42,7 @@ type ApplicationEventsProducer struct {
 //  name of the producer
 // return:
 //  built producer
-func NewApplicationEventsProducer (client bus.NalejClient, name string) (*ApplicationEventsProducer, derrors.Error) {
+func NewApplicationEventsProducer(client bus.NalejClient, name string) (*ApplicationEventsProducer, derrors.Error) {
 	prod, err := client.BuildProducer(name, ApplicationEventsTopic)
 	if err != nil {
 		return nil, err
@@ -41,7 +53,7 @@ func NewApplicationEventsProducer (client bus.NalejClient, name string) (*Applic
 // Generic function that decides what to send depending on the object type.
 func (m ApplicationEventsProducer) Send(ctx context.Context, msg proto.Message) derrors.Error {
 
-	var  wrapper grpc_bus_go.ApplicationEvents
+	var wrapper grpc_bus_go.ApplicationEvents
 
 	switch x := msg.(type) {
 	case *grpc_conductor_go.DeploymentServiceUpdateRequest:
@@ -87,7 +99,7 @@ func NewConfigApplicationEventsConsumer(size int, toConsume ConsumableStructsApp
 
 	return ConfigApplicationEventsConsumer{
 		ChDeploymentServiceStatusUpdateRequest: chDeploymentServiceStatusUpdateRequest,
-		ToConsume: toConsume,
+		ToConsume:                              toConsume,
 	}
 }
 
@@ -97,17 +109,17 @@ type ApplicationEventsConsumer struct {
 	Config   ConfigApplicationEventsConsumer
 }
 
-func NewApplicationEventsConsumer (client bus.NalejClient, name string, exclusive bool, config ConfigApplicationEventsConsumer) (*ApplicationEventsConsumer, derrors.Error) {
+func NewApplicationEventsConsumer(client bus.NalejClient, name string, exclusive bool, config ConfigApplicationEventsConsumer) (*ApplicationEventsConsumer, derrors.Error) {
 	consumer, err := client.BuildConsumer(name, ApplicationEventsTopic, exclusive)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ApplicationEventsConsumer{Consumer: consumer,Config: config}, nil
+	return &ApplicationEventsConsumer{Consumer: consumer, Config: config}, nil
 }
 
 // Consume any of the possible objects that can be sent to this queue and send it to the corresponding channel.
-func (c ApplicationEventsConsumer) Consume(ctx context.Context) derrors.Error{
+func (c ApplicationEventsConsumer) Consume(ctx context.Context) derrors.Error {
 	msg, err := c.Consumer.Receive(ctx)
 	if err != nil {
 		return err
@@ -130,8 +142,8 @@ func (c ApplicationEventsConsumer) Consume(ctx context.Context) derrors.Error{
 		log.Error().Msg(errMsg)
 		return derrors.NewInvalidArgumentError(errMsg)
 	default:
-		errMsg := fmt.Sprintf("unknown object type in %s",ApplicationEventsTopic)
-		log.Error().Interface("type",x).Msg(errMsg)
+		errMsg := fmt.Sprintf("unknown object type in %s", ApplicationEventsTopic)
+		log.Error().Interface("type", x).Msg(errMsg)
 		return derrors.NewInvalidArgumentError(errMsg)
 	}
 	return nil
