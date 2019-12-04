@@ -9,6 +9,9 @@
   "image_list": [
     ""
   ],
+  "component_list": [
+    "pulsar"
+  ],
   "tools": [
     "docker",
     "k8s"
