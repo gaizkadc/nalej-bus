@@ -107,7 +107,7 @@ stages:
     - template: k8s/resources/create.yaml@ci_templates
       parameters:
         kubeconfig: $(kubeconfig)
-        platform: appcluster
+        platform: mngtcluster
         environment: "staging"
     
     - template: templates/verify_deploy.yaml
