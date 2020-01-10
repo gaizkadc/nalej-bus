@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: pulsar-manager
+  labels:
+    cluster: management
+    compoment: pulsar
+  namespace: nalej
+spec:
+  selector:
+    cluster: management
+    component: pulsar
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 9527
+    targetPort: 9527
