@@ -1,0 +1,52 @@
+###
+# Pulsar Manager
+###
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    cluster: management
+    component: pulsar
+  name: pulsar-manager
+  namespace: nalej
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      cluster: management
+      component: pulsar
+  template:
+    metadata:
+      labels:
+        cluster: management
+        component: pulsar
+    spec:
+      containers:
+        - name: pulsar-manager
+          image: apachepulsar/pulsar-manager:v0.1.0
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: manager-data
+              mountPath: "/data"
+          env:
+          - name: DRIVER_CLASS_NAME
+            value: "org.postgresql.Driver"
+          - name: URL
+            value: "jdbc:postgresql://127.0.0.1:5432/pulsar_manager"
+          - name: USERNAME
+            value: "pulsar"
+          - name: PASSWORD
+            value: "pulsar"
+          - name: LOG_LEVEL
+            value: "DEBUG"
+          - name: REDIRECT_PORT
+            value: "9527"
+          - name: REDIRECT_HOST
+            value: "http://pulsar-manager.nalej"
+          securityContext:
+            runAsUser: 0
+      volumes:
+        - name: manager-data
+          emptyDir: {}
